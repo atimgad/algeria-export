@@ -2,7 +2,7 @@
 
 import { Building2, MapPin, Phone, Globe } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase-client'
+import { supabase } from '@/lib/supabase'
 
 interface Entreprise {
   id: number

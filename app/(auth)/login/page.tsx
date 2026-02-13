@@ -14,28 +14,37 @@ export default function LoginPage() {
   const [message, setMessage] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage('');
+  e.preventDefault();
+  setLoading(true);
+  setMessage('');
 
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
+  try {
+    console.log('Tentative de connexion avec:', email);
+    
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
 
-      if (error) {
-        setMessage('Erreur: ' + error.message);
-      } else {
-        setMessage('Connexion reussie !');
+    console.log('Réponse Supabase:', { data, error });
+
+    if (error) {
+      setMessage('❌ Erreur: ' + error.message);
+    } else {
+      setMessage('✅ Connexion réussie ! Redirection...');
+      console.log('Utilisateur connecté:', data.user);
+      
+      setTimeout(() => {
         window.location.href = '/dashboard';
-      }
-    } catch (error) {
-      setMessage('Une erreur est survenue');
-    } finally {
-      setLoading(false);
+      }, 1000);
     }
-  };
+  } catch (error: any) {
+    console.error('Exception:', error);
+    setMessage('❌ Erreur: ' + error.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
