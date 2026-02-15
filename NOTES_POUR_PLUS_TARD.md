@@ -82,3 +82,19 @@ Ce fichier centralise toutes les idees, am‚liorations et tƒches diff‚r‚es … repr
 --- 
  
 Ce fichier sera mis … jour au fur et … mesure des sessions de travail. 
+  
+## ??? ACTIVATION DES FONCTIONNALIT?S DU DASHBOARD  
+  
+**Objectif** : Rendre tous les ‚l‚ments cliquables et fonctionnels.  
+  
+- [ ] Notifications ? Page notifications  
+- [ ] Avatar/Profil ? Page profil  
+- [ ] KPIs (Profile Views) ? Statistiques d‚taill‚es  
+- [ ] KPIs (Active Inquiries) ? Liste des demandes  
+- [ ] KPIs (Active Products) ? Gestion produits  
+- [ ] KPIs (International Buyers) ? Liste acheteurs  
+- [ ] Tableau des demandes ? D‚tail de chaque demande  
+- [ ] View all ? Page complŠte des inquiries  
+- [ ] Barres de progression ? Liens vers sections  
+- [ ] Quick Action (Add Product) ? Formulaire produit  
+- [ ] Quick Action (Documents) ? Gestion documentaire 
