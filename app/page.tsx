@@ -6,6 +6,7 @@ import HowItWorks from "@/components/home/HowItWorks";
 import ValueProposition from "@/components/home/ValueProposition"; 
 import FeaturedSuppliers from "@/components/home/FeaturedSuppliers"; 
 import FinalCTA from "@/components/home/FinalCTA"; 
+import Footer from "@/components/layout/Footer"; 
  
 export default function Home() { 
   return ( 
@@ -18,6 +19,7 @@ export default function Home() {
       <ValueProposition /> 
       <FeaturedSuppliers /> 
       <FinalCTA /> 
+      <Footer /> 
     </main> 
   ); 
 } 
