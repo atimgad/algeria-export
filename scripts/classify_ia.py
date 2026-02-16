@@ -1,30 +1,25 @@
 import os
-import psycopg2
-import pandas as pd
+import requests
+import time
 from transformers import pipeline
-import socket
 import warnings
 warnings.filterwarnings('ignore')
 
-# Configuration directe avec résolution DNS
-try:
-    host_ip = socket.gethostbyname('db.uoaafekflbksvkzulclt.supabase.co')
-    print(f"✅ DNS résolu: {host_ip}")
-except:
-    host_ip = '13.38.176.27'  # IP de fallback
-    print(f"⚠️ Utilisation IP de secours: {host_ip}")
-
-DB_CONFIG = {
-    'host': host_ip,
-    'port': 5432,
-    'database': 'postgres',
-    'user': 'postgres',
-    'password': 'sb_publishable_0rxwFGFxcGZqqcOBaQT4Rg_5N7fHR22'
+# Configuration API Supabase
+SUPABASE_URL = "https://uoaafekflbksvkzulclt.supabase.co"
+SUPABASE_KEY = "sb_publishable_0rxwFGFxcGZqqcOBaQT4Rg_5N7fHR22"
+HEADERS = {
+    "apikey": SUPABASE_KEY,
+    "Authorization": f"Bearer {SUPABASE_KEY}",
+    "Content-Type": "application/json"
 }
 
-print("🚀 Chargement du modèle IA...")
-classifier = pipeline("zero-shot-classification", 
-                     model="facebook/bart-large-mnli")
+print("="*60)
+print("🚀 CLASSIFICATION IA - NEC PLUS ULTRA")
+print("="*60)
+
+print("\n🔄 Chargement du modèle IA...")
+classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
 print("✅ Modèle chargé")
 
 SECTEURS = [
@@ -50,6 +45,7 @@ SECTEURS = [
 def classifier_entreprise(nom, produits):
     texte = f"{nom} { ' '.join(produits[:3]) if produits else ''}".lower()
     
+    # Règles prioritaires
     if 'huile' in texte and 'moteur' in texte:
         return "Lubrifiants & Produits Pétroliers", 1.0
     if 'huile' in texte and 'lubrifiant' in texte:
@@ -64,64 +60,70 @@ def classifier_entreprise(nom, produits):
     try:
         resultat = classifier(texte, SECTEURS)
         return resultat['labels'][0], resultat['scores'][0]
-    except:
+    except Exception as e:
+        print(f"⚠️ Erreur IA: {e}")
         return "Autres Secteurs", 0.5
 
 def main():
-    print("="*60)
-    print("🤖 CLASSIFICATION IA")
-    print("="*60)
+    print("\n🔄 Récupération des entreprises non classifiées...")
     
-    try:
-        print("🔄 Connexion...")
-        conn = psycopg2.connect(**DB_CONFIG)
-        print("✅ Connecté")
-    except Exception as e:
-        print(f"❌ Erreur: {e}")
+    response = requests.get(
+        f"{SUPABASE_URL}/rest/v1/exporters",
+        headers=HEADERS,
+        params={
+            "select": "id,name,products",
+            "activity_sector": "eq.Autres secteurs",
+            "limit": 1000
+        }
+    )
+    
+    if response.status_code != 200:
+        print(f"❌ Erreur API: {response.status_code}")
+        print(response.text)
         return
     
-    cursor = conn.cursor()
+    entreprises = response.json()
+    print(f"📊 {len(entreprises)} entreprises à classifier")
     
-    cursor.execute("SELECT COUNT(*) FROM exporters")
-    total = cursor.fetchone()[0]
-    print(f"📊 Total entreprises: {total}")
+    if len(entreprises) == 0:
+        print("✅ Aucune entreprise à classifier")
+        return
     
-    cursor.execute("""
-        SELECT id, name, products 
-        FROM exporters 
-        WHERE activity_sector IS NULL 
-           OR activity_sector = 'Autres Secteurs'
-        LIMIT 100
-    """)
+    print("\n🚀 Début de la classification...\n")
     
-    entreprises = cursor.fetchall()
-    
-    for i, (id_, nom, produits) in enumerate(entreprises, 1):
-        if produits and isinstance(produits, str):
+    for i, e in enumerate(entreprises, 1):
+        produits = e.get('products', [])
+        if isinstance(produits, str):
             try:
                 produits = eval(produits) if produits.startswith('[') else []
             except:
                 produits = []
         
-        secteur, confiance = classifier_entreprise(nom, produits)
+        secteur, confiance = classifier_entreprise(e['name'], produits)
         
-        cursor.execute("""
-            UPDATE exporters 
-            SET activity_sector = %s,
-                confidence_score = %s,
-                classification_method = 'ia',
-                needs_review = %s,
-                last_classified = NOW()
-            WHERE id = %s
-        """, (secteur, confiance, confiance < 0.8, id_))
+        update_response = requests.patch(
+            f"{SUPABASE_URL}/rest/v1/exporters",
+            headers=HEADERS,
+            params={"id": f"eq.{e['id']}"},
+            json={
+                "activity_sector": secteur,
+                "confidence_score": confiance,
+                "classification_method": "ia",
+                "needs_review": confiance < 0.8,
+                "last_classified": "now()"
+            }
+        )
         
-        print(f"   {i}/{len(entreprises)} - {nom[:30]}... → {secteur}")
+        if update_response.status_code == 204:
+            print(f"   ✅ {i}/{len(entreprises)} - {e['name'][:40]:<40} → {secteur[:30]} ({confiance:.2f})")
+        else:
+            print(f"   ❌ {i}/{len(entreprises)} - Erreur {update_response.status_code}: {update_response.text}")
         
-        if i % 10 == 0:
-            conn.commit()
+        time.sleep(0.2)
     
-    conn.commit()
-    print("✅ Terminé")
+    print("\n" + "="*60)
+    print("✅ CLASSIFICATION TERMINÉE")
+    print("="*60)
 
 if __name__ == "__main__":
     main()

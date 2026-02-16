@@ -1,11 +1,23 @@
+import SecureMessage from '../components/messaging/SecureMessage';
+
 export default function TestPage() {
+  const testMessages = [
+    "Contactez-moi sur email@test.com",
+    "Mon téléphone: 0550123456",
+    "Whatsapp: +213550123456",
+    "Mon site: https://contournement.com",
+    "Message normal sans contact"
+  ];
+
   return (
-    <div style={{padding: '50px', textAlign: 'center'}}>
-      <h1 style={{color: 'red', fontSize: '48px'}}>✅ TEST RÉUSSI !</h1>
-      <p style={{fontSize: '24px'}}>Le serveur fonctionne correctement</p>
-      <a href="/login" style={{fontSize: '20px', color: 'blue'}}>
-        Aller à la page de login
-      </a>
+    <div className="p-8 space-y-4">
+      <h1 className="text-2xl font-bold">Test du filtre de sécurité</h1>
+      {testMessages.map((msg, i) => (
+        <div key={i} className="border p-4 rounded">
+          <p className="text-sm text-gray-500 mb-2">Message original: {msg}</p>
+          <SecureMessage message={msg} />
+        </div>
+      ))}
     </div>
   );
 }
