@@ -97,3 +97,25 @@ git push origin main
 1. Implémenter le chiffrement de bout en bout
 2. Ajouter le rate limiting avancé
 3. Créer le dashboard admin de surveillance
+
+## Session 16/02/2026 (fin) - Système de commissions et promotions
+
+### Objectifs atteints
+- ✅ Tables de transactions et commissions créées
+- ✅ Système de promotions flexible (première transaction gratuite)
+- ✅ Trigger automatique pour les nouveaux fournisseurs
+- ✅ Promotions appliquées à tous les fournisseurs existants
+- ✅ API de calcul de commission prête
+
+### État actuel
+- Tables : transactions, supplier_plans, commission_promotions, commission_history
+- Fonction : calculate_applicable_commission
+- Trigger : trg_create_first_transaction_promotion
+- Promotions actives : tous les fournisseurs ont droit à 1 transaction gratuite
+
+### Prochaines étapes (nouveau chat)
+1. Intégration Stripe pour les paiements
+2. Dashboard admin des commissions
+3. Interface fournisseur pour voir ses gains
+4. Système de facturation automatique
+5. Tests de bout en bout

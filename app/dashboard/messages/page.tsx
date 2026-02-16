@@ -1,79 +1,121 @@
-import { createServerClient } from '@supabase/ssr';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Building2, Package, MessageSquare, TrendingUp, Users, Settings, LogOut, Globe, Shield, Clock, FileCheck, Bell, Eye } from "lucide-react";
 import Link from "next/link";
-import Header from '../components/Header';
 
 export default async function DashboardPage() {
-  const cookieStore = await cookies();
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set() {},
-        remove() {},
-      },
-    }
-  );
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
+  const supabase = createServerComponentClient({ cookies });
+  
+  // Vérifier si l'utilisateur est connecté
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  if (!session) {
     redirect('/login');
   }
 
+  // Récupérer les données de l'utilisateur depuis la table users
   const { data: userData } = await supabase
     .from('users')
     .select('*')
-    .eq('id', user.id)
+    .eq('id', session.user.id)
     .single();
 
+  // Récupérer les produits de l'utilisateur
   const { data: products } = await supabase
     .from('products')
     .select('*')
-    .eq('user_id', user.id);
+    .eq('user_id', session.user.id);
 
+  // Récupérer les messages/inquiries
   const { data: inquiries } = await supabase
     .from('messages')
     .select('*')
-    .eq('recipient_id', user.id)
+    .eq('recipient_id', session.user.id)
     .order('created_at', { ascending: false })
     .limit(5);
 
   const productCount = products?.length || 0;
   const inquiryCount = inquiries?.length || 0;
   const newInquiries = inquiries?.filter(i => i.status === 'new').length || 0;
-  const profileViews = 247;
-  const internationalBuyers = 14;
 
+  // Simulation de stats (à remplacer par de vraies données plus tard)
+  const profileViews = 247; // À connecter à une table analytics
+  const internationalBuyers = 14; // À connecter à une table buyers
+
+  // Initiales pour l'avatar
   const initials = userData?.full_name
     ?.split(' ')
-    .map((n: string) => n[0])
+    .map(n => n[0])
     .join('')
-    .toUpperCase() || user.email?.[0].toUpperCase() || 'U';
+    .toUpperCase() || session.user.email?.[0].toUpperCase() || 'U';
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      <Header
-        isAuthenticated={true}
-        userEmail={user.email || ''}
-        userName={userData?.full_name || null}
-        companyName={userData?.company_name || null}
-        initials={initials}
-        newInquiries={newInquiries}
-      />
+      {/* Header avec z-index élevé pour le menu déroulant */}
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-[100]">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center relative">
+          <Link href="/" className="text-2xl font-bold">
+            <span className="text-[#003153]">Algeria<span className="text-[#2E7D32]">Export</span></span>
+          </Link>
+          <div className="flex items-center gap-6 relative z-[101]">
+            <button className="relative">
+              <Bell className="h-5 w-5 text-gray-600" />
+              {newInquiries > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#D21034] rounded-full text-[10px] flex items-center justify-center text-white">
+                  {newInquiries}
+                </span>
+              )}
+            </button>
+            
+            {/* Menu utilisateur avec dropdown */}
+            <div className="relative group">
+              <div className="flex items-center gap-3 cursor-pointer">
+                <div className="text-right">
+                  <p className="text-sm font-medium text-[#003153]">{userData?.company_name || 'Company Name'}</p>
+                  <p className="text-xs text-gray-500">Verified Supplier</p>
+                </div>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#003153] to-[#2E7D32] flex items-center justify-center text-white font-bold text-lg shadow-md">
+                  {initials}
+                </div>
+              </div>
+              
+              {/* Dropdown menu avec z-index très élevé */}
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[200]">
+                <div className="px-4 py-2 border-b border-gray-100">
+                  <p className="text-sm font-medium text-[#003153]">{userData?.email || session.user.email}</p>
+                  <p className="text-xs text-gray-500">Verified Supplier</p>
+                </div>
+                <Link
+                  href="/dashboard/settings"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <Settings className="h-4 w-4" />
+                  Paramètres
+                </Link>
+                <button
+                  onClick={async () => {
+                    const supabase = createServerComponentClient({ cookies });
+                    await supabase.auth.signOut();
+                    redirect('/login');
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Déconnexion
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
 
-      <div className="container mx-auto px-4 py-8">
+      {/* Main content avec z-index normal */}
+      <div className="container mx-auto px-4 py-8 relative z-10">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-[#003153]">Trade Infrastructure Dashboard</h1>
-            <p className="text-gray-600 mt-1">Welcome back, {userData?.full_name?.split(' ')[0] || user.email}</p>
+            <p className="text-gray-600 mt-1">Welcome back, {userData?.full_name?.split(' ')[0] || session.user.email}</p>
           </div>
           <div className="flex gap-3">
             <button className="px-4 py-2 bg-[#003153] text-white rounded-lg hover:bg-[#002244] transition flex items-center gap-2 text-sm font-medium">
@@ -96,7 +138,7 @@ export default async function DashboardPage() {
             <p className="text-3xl font-bold text-[#003153] mb-1">{profileViews}</p>
             <p className="text-sm text-gray-500">Profile Views</p>
           </div>
-
+          
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-[#003153]/10 rounded-lg">
@@ -109,7 +151,7 @@ export default async function DashboardPage() {
             <p className="text-3xl font-bold text-[#003153] mb-1">{inquiryCount}</p>
             <p className="text-sm text-gray-500">Active Inquiries</p>
           </div>
-
+          
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-[#003153]/10 rounded-lg">
@@ -120,7 +162,7 @@ export default async function DashboardPage() {
             <p className="text-3xl font-bold text-[#003153] mb-1">{productCount}</p>
             <p className="text-sm text-gray-500">Active Products</p>
           </div>
-
+          
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-[#003153]/10 rounded-lg">
@@ -141,7 +183,7 @@ export default async function DashboardPage() {
             </div>
             <div className="space-y-4">
               {inquiries && inquiries.length > 0 ? (
-                inquiries.map((inquiry: any) => (
+                inquiries.map((inquiry) => (
                   <div key={inquiry.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-[#003153]/10 rounded-full flex items-center justify-center text-[#003153] font-bold">
@@ -153,8 +195,8 @@ export default async function DashboardPage() {
                       </div>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full ${
-                      inquiry.status === 'new'
-                        ? 'bg-[#2E7D32] text-white'
+                      inquiry.status === 'new' 
+                        ? 'bg-[#2E7D32] text-white' 
                         : inquiry.status === 'in_progress'
                         ? 'bg-gray-200 text-gray-700'
                         : 'bg-[#003153]/10 text-[#003153]'
@@ -191,7 +233,7 @@ export default async function DashboardPage() {
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-[#2E7D32] h-2 rounded-full"
+                  <div className="bg-[#2E7D32] h-2 rounded-full" 
                        style={{width: userData?.full_name && userData?.company_name ? '85%' : '60%'}}>
                   </div>
                 </div>
@@ -202,7 +244,7 @@ export default async function DashboardPage() {
                   <span className="font-medium text-[#2E7D32]">{productCount}/10</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-[#2E7D32] h-2 rounded-full"
+                  <div className="bg-[#2E7D32] h-2 rounded-full" 
                        style={{width: `${Math.min((productCount / 10) * 100, 100)}%`}}>
                   </div>
                 </div>
