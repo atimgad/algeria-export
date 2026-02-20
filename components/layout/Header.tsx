@@ -54,8 +54,8 @@ export function Header() {
     <header className="border-b bg-white">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <Link href="/" className="text-xl font-bold">
-          <span className="text-[#D21034]">Algérie</span>
-          <span className="text-[#003153]">Export</span>
+          <span className="text-[#2E7D32]">Algeria</span>
+          <span className="text-[#D21034]">Export</span>
         </Link>
 
         <nav className="flex items-center gap-4">
