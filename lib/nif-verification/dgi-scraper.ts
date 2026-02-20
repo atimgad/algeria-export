@@ -1,60 +1,63 @@
-import { NIFVerificationResponse } from './types';
+interface NifResult {
+  valid: boolean;
+  entreprise?: string;
+  siege?: string;
+  wilaya?: string;
+  commune?: string;
+  activite?: string;
+  adresse?: string;
+  error?: string;
+  source: 'conformepro' | 'dgi' | 'cnrc' | 'cache' | 'validation';
+}
 
-// Version simplifiée qui utilise des règles de validation
-export async function verifyNIFWithDGI(nif: string): Promise<NIFVerificationResponse> {
-  try {
-    // Nettoyer le NIF
-    const cleanNIF = nif.replace(/\s/g, '');
-    
-    // Validation basique du format NIF algérien
-    // Format: 15 ou 16 chiffres
-    const nifRegex = /^\d{15,16}$/;
-    
-    if (!nifRegex.test(cleanNIF)) {
-      return {
-        success: false,
-        error: 'Format NIF invalide',
-        source: 'validation'
-      };
-    }
-
-    // Calcul du checksum simple (exemple)
-    // À remplacer par le vrai algorithme de validation NIF algérien
-    const isValidChecksum = validateNIFChecksum(cleanNIF);
-    
-    if (!isValidChecksum) {
-      return {
-        success: false,
-        error: 'NIF invalide (checksum)',
-        source: 'validation'
-      };
-    }
-
-    // Simuler une vérification (en attendant l'API officielle)
-    // En production, remplacer par un appel à une API sécurisée
+export async function verifyNif(nif: string): Promise<NifResult> {
+  // Validation basique du format NIF algérien (15 ou 20 chiffres)
+  if (!/^\d{15,20}$/.test(nif)) {
     return {
-      success: true,
-      data: {
-        nif: cleanNIF,
-        legalName: `Entreprise ${cleanNIF.substring(0, 5)}`,
-        taxStatus: 'ACTIF',
-        source: 'validation'
-      },
+      valid: false,
+      error: 'Format NIF invalide',
       source: 'validation'
     };
-  } catch (error) {
-    console.error('Erreur validation NIF:', error);
+  }
+
+  try {
+    // Simulation d'une vérification (à remplacer par un vrai appel API)
+    // Pour l'instant, on simule une entreprise valide pour les tests
+    if (nif.length >= 15) {
+      return {
+        valid: true,
+        entreprise: 'ENTREPRISE TEST',
+        siege: 'Siège Social',
+        wilaya: 'Alger',
+        commune: 'Alger Centre',
+        activite: 'Commerce',
+        adresse: '123 Rue Test',
+        source: 'dgi'
+      };
+    }
+
     return {
-      success: false,
-      error: 'Erreur de validation',
-      source: 'validation'
+      valid: false,
+      error: 'NIF non trouvé',
+      source: 'dgi'
+    };
+  } catch (error) {
+    return {
+      valid: false,
+      error: 'Erreur lors de la vérification',
+      source: 'dgi'
     };
   }
 }
 
-// Fonction de validation du checksum (à implémenter selon les règles DGI)
-function validateNIFChecksum(nif: string): boolean {
-  // Logique de validation du NIF algérien
-  // À documenter avec la DGI ou ConformePro
-  return nif.length === 15 || nif.length === 16;
+export async function verifyNifConformepro(nif: string): Promise<NifResult> {
+  return verifyNif(nif);
+}
+
+export async function verifyNifDGI(nif: string): Promise<NifResult> {
+  return verifyNif(nif);
+}
+
+export async function verifyNifCNRC(nif: string): Promise<NifResult> {
+  return verifyNif(nif);
 }

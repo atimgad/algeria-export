@@ -1,184 +1,164 @@
-import { createClient } from '@/lib/supabase-server';
-import { Building2, Phone, Mail, Globe, Package, Search, ChevronLeft, ChevronRight } from 'lucide-react';
-import Link from 'next/link';
-import SecteurFilter from './components/SecteurFilter';
-import ExporterCard from './components/ExporterCard';
+import { createServerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import Image from 'next/image'
+import Link from 'next/link'
+import { MapPin, Package, Award, Building2, Search } from 'lucide-react'
+import SecteurFilter from './components/SecteurFilter'
 
-const ITEMS_PER_PAGE = 20;
-
-export default async function ExportersPage(props: { 
-  searchParams: Promise<{ secteur?: string; page?: string }> 
-}) {
-  const searchParams = await props.searchParams;
-  const supabase = await createClient();
+export default async function ExportersPage() {
+  const cookieStore = await cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set(name: string, value: string, options: any) {
+          cookieStore.set(name, value, options)
+        },
+        remove(name: string, options: any) {
+          cookieStore.set(name, '', options)
+        },
+      },
+    }
+  )
   
-  const secteur = searchParams.secteur;
-  const currentPage = Number(searchParams.page) || 1;
-  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-  
-  // Compter le total pour la pagination
-  let countQuery = supabase.from('exporters').select('*', { count: 'exact', head: true });
-  
-  // Requête pour les données
-  let dataQuery = supabase
-    .from('exporters')
-    .select('*')
-    .order('name')
-    .range(offset, offset + ITEMS_PER_PAGE - 1);
-  
-  // Filtrer par secteur si spécifié
-  if (secteur) {
-    countQuery = countQuery.eq('activity_sector', secteur);
-    dataQuery = dataQuery.eq('activity_sector', secteur);
-  }
-  
-  const [{ count }, { data: exporters }] = await Promise.all([
-    countQuery,
-    dataQuery
-  ]);
-
-  const totalPages = Math.ceil((count || 0) / ITEMS_PER_PAGE);
-
-  // Récupérer tous les secteurs pour le filtre
-  const { data: allExporters } = await supabase
-    .from('exporters')
-    .select('activity_sector')
+  const { data: exporters, error } = await supabase
+    .from('profiles')
+    .select(`
+      *,
+      products:products(*)
+    `)
+    .eq('user_type', 'exporter')
+    .eq('verification_status', 'verified')
+    .order('company_name')
     .limit(5000);
-  
-  const secteurs = [...new Set(allExporters?.map(e => e.activity_sector).filter(Boolean))];
+
+  const secteurs = Array.from(new Set(exporters?.map(e => e.activity_sector).filter(Boolean) || []));
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <Link href="/" className="text-2xl font-bold">
-              <span className="text-[#003153]">Algeria<span className="text-[#2E7D32]">Export</span></span>
-            </Link>
-            <nav className="flex items-center gap-6">
-              <Link href="/" className="text-gray-600 hover:text-[#003153]">Accueil</Link>
-              <Link href="/exporters" className="text-[#003153] font-medium">Exportateurs</Link>
-              <Link href="/stats" className="text-gray-600 hover:text-[#003153]">Statistiques</Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* Main content */}
-      <main className="container mx-auto px-4 py-8">
-        {/* Hero section */}
-        <div className="bg-gradient-to-r from-[#003153] to-[#2E7D32] text-white rounded-2xl p-8 mb-8">
-          <h1 className="text-4xl font-bold mb-4">
-            {secteur ? `Secteur : ${secteur}` : 'Répertoire des Exportateurs Algériens'}
-          </h1>
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-[#003153] to-[#2E7D32] text-white py-16">
+        <div className="container mx-auto px-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Exportateurs Algériens Certifiés</h1>
           <p className="text-xl opacity-90 max-w-3xl">
-            {secteur 
-              ? `${exporters?.length || 0} entreprises dans ce secteur`
-              : 'Découvrez la liste complète des entreprises algériennes exportatrices'}
+            Découvrez notre réseau de fournisseurs vérifiés, leaders dans leurs secteurs respectifs
           </p>
-          {secteur && (
-            <Link 
-              href="/exporters" 
-              className="mt-4 inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 hover:bg-white/30 transition"
-            >
-              ← Voir tous les secteurs
-            </Link>
-          )}
         </div>
+      </div>
 
-        {/* Search and filter */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
-          <div className="flex gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <input
-                type="text"
-                placeholder="Rechercher une entreprise..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003153] focus:border-transparent"
-              />
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar - Filtres */}
+          <aside className="lg:w-64">
+            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
+              <h2 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                <Search className="h-5 w-5 text-[#2E7D32]" />
+                Filtres
+              </h2>
+              <SecteurFilter secteurs={secteurs} />
             </div>
-            <SecteurFilter currentSecteur={secteur} secteurs={secteurs} />
-          </div>
-        </div>
+          </aside>
 
-        {/* Exporters grid */}
-        {exporters && exporters.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {exporters.map((exporter) => (
-              <ExporterCard
-                key={exporter.id}
-                id={exporter.id}
-                name={exporter.name}
-                company_type={exporter.company_type}
-                activity_sector={exporter.activity_sector}
-                products={exporter.products}
-                phone={exporter.phone}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <Building2 className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-[#003153] mb-2">
-              Aucune entreprise trouvée
-            </h3>
-            <p className="text-gray-500">
-              {secteur 
-                ? `Aucune entreprise dans le secteur "${secteur}"`
-                : 'La liste des exportateurs sera bientôt disponible.'}
-            </p>
-          </div>
-        )}
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-8 flex justify-center items-center gap-2">
-            {currentPage > 1 && (
-              <Link
-                href={`/exporters?${secteur ? `secteur=${encodeURIComponent(secteur)}&` : ''}page=${currentPage - 1}`}
-                className="p-2 bg-white rounded-lg border border-gray-200 hover:border-[#003153] transition"
-              >
-                <ChevronLeft className="h-5 w-5 text-[#003153]" />
-              </Link>
-            )}
-            
-            <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum = i + 1;
-                if (currentPage > 3) {
-                  pageNum = currentPage - 2 + i;
-                }
-                if (pageNum <= totalPages) {
-                  return (
-                    <Link
-                      key={pageNum}
-                      href={`/exporters?${secteur ? `secteur=${encodeURIComponent(secteur)}&` : ''}page=${pageNum}`}
-                      className={`w-10 h-10 flex items-center justify-center rounded-lg transition ${
-                        currentPage === pageNum
-                          ? 'bg-[#003153] text-white'
-                          : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
-                      }`}
-                    >
-                      {pageNum}
-                    </Link>
-                  );
-                }
-                return null;
-              })}
+          {/* Liste des exportateurs */}
+          <div className="flex-1">
+            {/* En-tête avec compteur */}
+            <div className="bg-white rounded-xl shadow-sm p-4 mb-6 flex justify-between items-center">
+              <p className="text-gray-600">
+                <span className="font-bold text-[#003153]">{exporters?.length || 0}</span> exportateurs certifiés
+              </p>
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <Award className="h-4 w-4 text-[#2E7D32]" />
+                <span>Vérifiés par AlgeriaExport</span>
+              </div>
             </div>
 
-            {currentPage < totalPages && (
-              <Link
-                href={`/exporters?${secteur ? `secteur=${encodeURIComponent(secteur)}&` : ''}page=${currentPage + 1}`}
-                className="p-2 bg-white rounded-lg border border-gray-200 hover:border-[#003153] transition"
-              >
-                <ChevronRight className="h-5 w-5 text-[#003153]" />
-              </Link>
+            {/* Grille des exportateurs */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {exporters?.map((exporter) => (
+                <Link 
+                  key={exporter.id}
+                  href={`/exporters/${exporter.id}`}
+                  className="bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 overflow-hidden group"
+                >
+                  {/* En-tête avec logo/initiale */}
+                  <div className="p-6 pb-4">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-16 h-16 bg-gradient-to-br from-[#003153] to-[#2E7D32] rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-md">
+                        {exporter.company_name?.charAt(0) || 'E'}
+                      </div>
+                      <span className="text-xs bg-[#2E7D32]/10 text-[#2E7D32] px-3 py-1 rounded-full font-medium">
+                        Certifié
+                      </span>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-[#003153] mb-1 group-hover:text-[#2E7D32] transition">
+                      {exporter.company_name}
+                    </h3>
+                    
+                    {exporter.activity_sector && (
+                      <p className="text-sm text-[#2E7D32] mb-3 font-medium">
+                        {exporter.activity_sector}
+                      </p>
+                    )}
+
+                    {exporter.description && (
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                        {exporter.description}
+                      </p>
+                    )}
+
+                    {/* Localisation */}
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                      <MapPin className="h-4 w-4 text-[#2E7D32]" />
+                      <span>{exporter.city || 'Algérie'}</span>
+                    </div>
+
+                    {/* Produits */}
+                    {exporter.products && exporter.products.length > 0 && (
+                      <div className="border-t border-gray-100 pt-4 mt-2">
+                        <p className="text-xs text-gray-400 mb-2 flex items-center gap-1">
+                          <Package className="h-3 w-3" />
+                          Produits principaux
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {exporter.products.slice(0, 3).map((product: any) => (
+                            <span 
+                              key={product.id}
+                              className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
+                            >
+                              {product.name}
+                            </span>
+                          ))}
+                          {exporter.products.length > 3 && (
+                            <span className="text-xs text-gray-400">
+                              +{exporter.products.length - 3}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {(!exporters || exporters.length === 0) && (
+              <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+                <Building2 className="h-16 w-16 mx-auto text-gray-300 mb-4" />
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">Aucun exportateur trouvé</h3>
+                <p className="text-gray-500">
+                  Il n'y a pas encore d'exportateurs certifiés dans cette catégorie.
+                </p>
+              </div>
             )}
           </div>
-        )}
-      </main>
+        </div>
+      </div>
     </div>
-  );
+  )
 }

@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient } from '@supabase/auth-helpers-nextjs';
+import { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
 import { UserCircle, LogOut } from 'lucide-react';
 import {
@@ -17,7 +18,7 @@ import {
 
 export function Header() {
   const pathname = usePathname();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   
   const supabase = createBrowserClient(

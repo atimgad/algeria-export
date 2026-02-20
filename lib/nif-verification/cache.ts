@@ -1,71 +1,44 @@
-import { createClient } from '@/lib/supabase-server';
-import { NIFVerificationResponse } from './types';
+interface CacheEntry {
+  valid: boolean;
+  data: any;
+  source: string;
+  timestamp: number;
+}
 
 export class NIFCache {
-  private static instance: NIFCache;
-  private memoryCache: Map<string, { data: NIFVerificationResponse; timestamp: number }>;
-  private readonly CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 jours
+  private static cache: Map<string, CacheEntry> = new Map();
+  private static readonly TTL = 24 * 60 * 60 * 1000; // 24 heures
 
-  private constructor() {
-    this.memoryCache = new Map();
-  }
-
-  static getInstance(): NIFCache {
-    if (!NIFCache.instance) {
-      NIFCache.instance = new NIFCache();
-    }
-    return NIFCache.instance;
-  }
-
-  async get(nif: string): Promise<NIFVerificationResponse | null> {
-    // Vérifier le cache mémoire
-    const cached = this.memoryCache.get(nif);
-    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-      return cached.data;
+  static async get(nif: string): Promise<CacheEntry | null> {
+    const entry = this.cache.get(nif);
+    
+    if (!entry) {
+      return null;
     }
 
-    // Vérifier le cache Supabase
-    try {
-      const supabase = await createClient();
-      const { data } = await supabase
-        .from('nif_cache')
-        .select('*')
-        .eq('nif', nif)
-        .single();
-
-      if (data && new Date(data.verified_at).getTime() > Date.now() - this.CACHE_TTL) {
-        const response = data.response as NIFVerificationResponse;
-        this.memoryCache.set(nif, { data: response, timestamp: Date.now() });
-        return response;
-      }
-    } catch (error) {
-      console.error('Erreur lecture cache Supabase:', error);
+    // Vérifier si le cache n'a pas expiré
+    if (Date.now() - entry.timestamp > this.TTL) {
+      this.cache.delete(nif);
+      return null;
     }
 
-    return null;
+    return entry;
   }
 
-  async set(nif: string, data: NIFVerificationResponse): Promise<void> {
-    // Cache mémoire
-    this.memoryCache.set(nif, { data, timestamp: Date.now() });
-
-    // Cache Supabase
-    try {
-      const supabase = await createClient();
-      await supabase
-        .from('nif_cache')
-        .upsert({
-          nif,
-          response: data,
-          verified_at: new Date().toISOString(),
-          expires_at: new Date(Date.now() + this.CACHE_TTL).toISOString()
-        });
-    } catch (error) {
-      console.error('Erreur écriture cache Supabase:', error);
-    }
+  static async set(nif: string, data: any, source: string): Promise<void> {
+    this.cache.set(nif, {
+      valid: true,
+      data,
+      source,
+      timestamp: Date.now()
+    });
   }
 
-  clear(): void {
-    this.memoryCache.clear();
+  static async clear(): Promise<void> {
+    this.cache.clear();
+  }
+
+  static async remove(nif: string): Promise<void> {
+    this.cache.delete(nif);
   }
 }

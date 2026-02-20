@@ -1,15 +1,32 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Building2, Package, MessageSquare, TrendingUp, Users, Settings, LogOut, Globe, Shield, Clock, FileCheck, Bell, Eye } from "lucide-react";
 import Link from "next/link";
 
 export default async function DashboardPage() {
-  const supabase = createServerComponentClient({ cookies });
-  
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+        set(name: string, value: string, options: any) {
+          cookieStore.set(name, value, options);
+        },
+        remove(name: string, options: any) {
+          cookieStore.set(name, '', options);
+        },
+      },
+    }
+  );
+
   // Vérifier si l'utilisateur est connecté
   const { data: { session } } = await supabase.auth.getSession();
-  
+
   if (!session) {
     redirect('/login');
   }
@@ -37,16 +54,16 @@ export default async function DashboardPage() {
 
   const productCount = products?.length || 0;
   const inquiryCount = inquiries?.length || 0;
-  const newInquiries = inquiries?.filter(i => i.status === 'new').length || 0;
+  const newInquiries = inquiries?.filter((i: { status: string }) => i.status === 'new').length || 0;
 
   // Simulation de stats (à remplacer par de vraies données plus tard)
-  const profileViews = 247; // À connecter à une table analytics
-  const internationalBuyers = 14; // À connecter à une table buyers
+  const profileViews = 247; // à connecter à une table analytics
+  const internationalBuyers = 14; // à connecter à une table buyers
 
-  // Initiales pour l'avatar
+  // Initiales pour l'avatar avec typage explicite
   const initials = userData?.full_name
     ?.split(' ')
-    .map(n => n[0])
+    .map((n: string) => n[0])
     .join('')
     .toUpperCase() || session.user.email?.[0].toUpperCase() || 'U';
 
@@ -67,7 +84,7 @@ export default async function DashboardPage() {
                 </span>
               )}
             </button>
-            
+
             {/* Menu utilisateur avec dropdown */}
             <div className="relative group">
               <div className="flex items-center gap-3 cursor-pointer">
@@ -79,7 +96,7 @@ export default async function DashboardPage() {
                   {initials}
                 </div>
               </div>
-              
+
               {/* Dropdown menu avec z-index très élevé */}
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[200]">
                 <div className="px-4 py-2 border-b border-gray-100">
@@ -95,7 +112,24 @@ export default async function DashboardPage() {
                 </Link>
                 <button
                   onClick={async () => {
-                    const supabase = createServerComponentClient({ cookies });
+                    const cookieStore = await cookies();
+                    const supabase = createServerClient(
+                      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+                      {
+                        cookies: {
+                          get(name: string) {
+                            return cookieStore.get(name)?.value;
+                          },
+                          set(name: string, value: string, options: any) {
+                            cookieStore.set(name, value, options);
+                          },
+                          remove(name: string, options: any) {
+                            cookieStore.set(name, '', options);
+                          },
+                        },
+                      }
+                    );
                     await supabase.auth.signOut();
                     redirect('/login');
                   }}
@@ -138,7 +172,7 @@ export default async function DashboardPage() {
             <p className="text-3xl font-bold text-[#003153] mb-1">{profileViews}</p>
             <p className="text-sm text-gray-500">Profile Views</p>
           </div>
-          
+
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-[#003153]/10 rounded-lg">
@@ -151,7 +185,7 @@ export default async function DashboardPage() {
             <p className="text-3xl font-bold text-[#003153] mb-1">{inquiryCount}</p>
             <p className="text-sm text-gray-500">Active Inquiries</p>
           </div>
-          
+
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-[#003153]/10 rounded-lg">
@@ -162,7 +196,7 @@ export default async function DashboardPage() {
             <p className="text-3xl font-bold text-[#003153] mb-1">{productCount}</p>
             <p className="text-sm text-gray-500">Active Products</p>
           </div>
-          
+
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-[#003153]/10 rounded-lg">
@@ -183,7 +217,7 @@ export default async function DashboardPage() {
             </div>
             <div className="space-y-4">
               {inquiries && inquiries.length > 0 ? (
-                inquiries.map((inquiry) => (
+                inquiries.map((inquiry: any) => (
                   <div key={inquiry.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-[#003153]/10 rounded-full flex items-center justify-center text-[#003153] font-bold">
@@ -195,8 +229,8 @@ export default async function DashboardPage() {
                       </div>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full ${
-                      inquiry.status === 'new' 
-                        ? 'bg-[#2E7D32] text-white' 
+                      inquiry.status === 'new'
+                        ? 'bg-[#2E7D32] text-white'
                         : inquiry.status === 'in_progress'
                         ? 'bg-gray-200 text-gray-700'
                         : 'bg-[#003153]/10 text-[#003153]'
@@ -233,7 +267,7 @@ export default async function DashboardPage() {
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-[#2E7D32] h-2 rounded-full" 
+                  <div className="bg-[#2E7D32] h-2 rounded-full"
                        style={{width: userData?.full_name && userData?.company_name ? '85%' : '60%'}}>
                   </div>
                 </div>
@@ -244,7 +278,7 @@ export default async function DashboardPage() {
                   <span className="font-medium text-[#2E7D32]">{productCount}/10</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-[#2E7D32] h-2 rounded-full" 
+                  <div className="bg-[#2E7D32] h-2 rounded-full"
                        style={{width: `${Math.min((productCount / 10) * 100, 100)}%`}}>
                   </div>
                 </div>

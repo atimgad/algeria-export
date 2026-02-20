@@ -1,108 +1,58 @@
 /* Google Fonts - Polices Algériennes */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&display=swap');
 
-/* Variables CSS Algériennes */
-:root {
-  --primary: #0A2E52;
-  --primary-light: #1A4A7A;
-  --primary-dark: #06203A;
-  --secondary: #0E5C4A;
-  --secondary-light: #1A7A63;
-  --secondary-dark: #0A4235;
-  --accent: #C6A75E;
-  --accent-light: #D4B87C;
-  --accent-dark: #B08C3A;
-  --background: #F5F7FA;
-}
-
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
-  * {
-    @apply border-border;
+  :root {
+    --primary: #0A2E52;
+    --primary-light: #1A4A7A;
+    --primary-dark: #06203A;
+    --secondary: #0E5C4A;
+    --secondary-light: #1A7A63;
+    --secondary-dark: #0A4235;
+    --accent: #C6A75E;
+    --accent-light: #D4B87C;
+    --accent-dark: #B08C3A;
+    --background: #F5F7FA;
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    background-color: var(--background);
+    font-family: 'Inter', sans-serif;
+    color: #1f2937;
   }
 
-  /* Application des couleurs algériennes */
-  .bg-primary {
-    background-color: var(--primary);
-  }
-  
-  .bg-secondary {
-    background-color: var(--secondary);
-  }
-  
-  .bg-accent {
-    background-color: var(--accent);
-  }
-  
-  .text-primary {
-    color: var(--primary);
-  }
-  
-  .text-secondary {
-    color: var(--secondary);
-  }
-  
-  .text-accent {
-    color: var(--accent);
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
   }
 }
 
-@layer utilities {
-  .step {
-    counter-increment: step;
-  }
+/* Classes de couleurs personnalisées */
+.bg-primary {
+  background-color: var(--primary);
+}
 
-  .step:before {
-    @apply absolute w-9 h-9 bg-muted rounded-full font-mono font-medium text-center text-base inline-flex items-center justify-center -indent-px border-4 border-background;
-    @apply ml-[-50px] mt-[-4px];
-    content: counter(step);
-  }
+.bg-secondary {
+  background-color: var(--secondary);
+}
+
+.bg-accent {
+  background-color: var(--accent);
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+.text-secondary {
+  color: var(--secondary);
+}
+
+.text-accent {
+  color: var(--accent);
 }
 
 /* Support RTL pour l'arabe */
@@ -111,15 +61,7 @@
   text-align: right;
 }
 
-/* Classes utilitaires pour les polices */
-.font-heading {
-  font-family: 'Montserrat', sans-serif;
-}
-
-.font-body {
-  font-family: 'Inter', sans-serif;
-}
-
+/* Police arabe */
 .font-arabic {
   font-family: 'Noto Sans Arabic', sans-serif;
 }

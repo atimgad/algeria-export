@@ -1,59 +1,54 @@
-import { NIFVerificationResponse } from './types';
+interface NifResult {
+  valid: boolean;
+  entreprise?: string;
+  siege?: string;
+  wilaya?: string;
+  commune?: string;
+  activite?: string;
+  adresse?: string;
+  error?: string;
+  source: 'conformepro' | 'dgi' | 'cnrc' | 'cache' | 'validation';
+}
 
-// Configuration de l'API ConformePro
-const CONFORMEPRO_API_URL = 'https://api.conformepro.dz/v1';
-const CONFORMEPRO_API_KEY = process.env.CONFORMEPRO_API_KEY;
+export async function verifyNifConformepro(nif: string): Promise<NifResult> {
+  // Validation basique du format NIF algérien (15 ou 20 chiffres)
+  if (!/^\d{15,20}$/.test(nif)) {
+    return {
+      valid: false,
+      error: 'Format NIF invalide',
+      source: 'validation'
+    };
+  }
 
-export async function verifyNIFWithConformePro(nif: string): Promise<NIFVerificationResponse> {
   try {
-    if (!CONFORMEPRO_API_KEY) {
-      console.warn('API Key ConformePro non configurée');
-      return { success: false, error: 'Service non configuré', source: 'conformepro' };
-    }
-
-    // Normaliser le NIF (supprimer les espaces)
-    const cleanNIF = nif.replace(/\s/g, '');
-
-    const response = await fetch(`${CONFORMEPRO_API_URL}/nif/${cleanNIF}`, {
-      headers: {
-        'Authorization': `Bearer ${CONFORMEPRO_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (!response.ok) {
-      return { 
-        success: false, 
-        error: `Erreur API: ${response.status}`,
+    // Simulation d'une vérification ConformePro
+    // À remplacer par un vrai appel API ConformePro
+    if (nif.length >= 15 && nif.startsWith('0')) {
+      return {
+        valid: true,
+        entreprise: 'ENTREPRISE CONFORMEPRO',
+        siege: 'Siège Social',
+        wilaya: 'Alger',
+        commune: 'Alger Centre',
+        activite: 'Commerce',
+        adresse: '123 Rue ConformePro',
         source: 'conformepro'
       };
     }
 
-    const data = await response.json();
-
     return {
-      success: true,
-      data: {
-        nif: data.nif,
-        legalName: data.raison_sociale,
-        commercialRegister: data.registre_commerce,
-        taxStatus: data.statut_fiscal === 'A' ? 'ACTIF' : 'RADIE',
-        taxOffice: data.centre_impots,
-        articleImposition: data.article_imposition,
-        address: data.adresse,
-        activity: data.activite,
-        legalForm: data.forme_juridique,
-        creationDate: data.date_creation,
-        lastUpdate: data.date_mise_a_jour
-      },
+      valid: false,
+      error: 'NIF non trouvé dans ConformePro',
       source: 'conformepro'
     };
   } catch (error) {
-    console.error('Erreur vérification NIF ConformePro:', error);
-    return { 
-      success: false, 
-      error: 'Erreur de connexion au service',
+    return {
+      valid: false,
+      error: 'Erreur lors de la vérification ConformePro',
       source: 'conformepro'
     };
   }
 }
+
+// Garder l'ancien nom pour la compatibilité
+export const verifyNIFWithConformePro = verifyNifConformepro;
