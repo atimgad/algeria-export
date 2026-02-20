@@ -65,6 +65,9 @@ export function Header() {
           <Link href="/stats" className="text-sm hover:text-[#2E7D32]">
             Statistiques
           </Link>
+          <Link href="/strategic-pillars" className="text-sm hover:text-[#2E7D32] font-medium text-[#003153] border-b-2 border-[#C6A75E]">
+            🇩🇿 Stratégie 2035
+          </Link>
           
           {!loading && user ? (
             <DropdownMenu>
