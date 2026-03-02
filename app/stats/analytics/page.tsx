@@ -1,7 +1,7 @@
 import { createServerSupabaseClient } from '@/utils/supabase/server';
-import AnalyticsDashboard from '@/components/analytics/AnalyticsDashboard';
+import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
 
-export default async function AnalyticsPage() {
+export default async function AnalyticsPage({ params: { lang } = { lang: 'fr' } }) {
   try {
     const supabase = await createServerSupabaseClient();
     
@@ -48,7 +48,6 @@ export default async function AnalyticsPage() {
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-3xl mx-auto">
           <h2 className="text-red-800 font-semibold text-xl mb-2">Erreur de chargement</h2>
           <p className="text-red-600">Une erreur est survenue lors du chargement des statistiques</p>
-          <p className="text-gray-500 text-sm mt-2">L'équipe technique a été notifiée.</p>
         </div>
       </div>
     );
