@@ -17,28 +17,39 @@ export default async function AnalyticsPage({ params: { lang } = { lang: 'fr' } 
       );
     }
 
-    // Récupérer les statistiques depuis Supabase
-    const { data: categoryStats } = await supabase
+    // Récupérer les statistiques par catégorie
+    const { data: categoryStats, error: catError } = await supabase
       .from('category_stats')
       .select('*');
 
-    const { count: totalViews } = await supabase
+    if (catError) {
+      console.error('Erreur catégories:', catError);
+      throw catError;
+    }
+
+    // Récupérer le nombre total d'entrées
+    const { count: totalCount, error: countError } = await supabase
       .from('official_directory')
       .select('*', { count: 'exact', head: true });
 
-    // Transformer les données pour correspondre au format attendu par AnalyticsDashboard
+    if (countError) {
+      console.error('Erreur comptage:', countError);
+      throw countError;
+    }
+
+    // Construction de l'objet stats conforme au type Stats attendu
     const stats = {
-      totalViews: totalViews || 0,
-      uniqueVisitors: Math.floor((totalViews || 0) * 0.7), // Approximation
-      viewsByDay: [],
+      totalViews: totalCount || 0,
+      uniqueVisitors: Math.floor((totalCount || 0) * 0.8), // Approximation 80% de visiteurs uniques
+      viewsByDay: [], // À implémenter si nécessaire
       topPages: (categoryStats || []).map(cat => ({
         path: cat.category,
-        views: cat.count || 0
+        count: cat.count || 0
       })),
       viewsBySource: [
-        { name: 'Direct', value: 45 },
-        { name: 'Recherche', value: 30 },
-        { name: 'Réseaux', value: 15 },
+        { name: 'Direct', value: 40 },
+        { name: 'Recherche', value: 35 },
+        { name: 'Réseaux sociaux', value: 15 },
         { name: 'Partenaires', value: 10 }
       ],
       viewsByCategory: (categoryStats || []).map(cat => ({
