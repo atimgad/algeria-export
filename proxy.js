@@ -1,10 +1,10 @@
-// middleware.js
+// proxy.js
 import { NextResponse } from 'next/server'
 
 const defaultLocale = 'fr'
 const locales = ['fr', 'en', 'de', 'it', 'es', 'ar', 'ru', 'zh', 'ja', 'ko', 'th', 'id', 'ms', 'hi', 'pt', 'sw', 'ha', 'yo', 'ig', 'am', 'so']
 
-export function middleware(request) {
+export function proxy(request) {
   const { pathname } = request.nextUrl
   
   // Vérifier si le chemin a déjà une locale
