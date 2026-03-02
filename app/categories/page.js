@@ -1,0 +1,218 @@
+// app/categories/page.js
+import { createServerSupabaseClient } from '@/utils/supabase/server';
+import Link from 'next/link';
+import { 
+  Building2, 
+  Sprout, 
+  FlaskConical, 
+  Cpu, 
+  Factory, 
+  Hammer, 
+  Car, 
+  ShoppingBag, 
+  Ship, 
+  Utensils, 
+  Newspaper, 
+  Gem, 
+  Leaf, 
+  Zap, 
+  Briefcase, 
+  Globe, 
+  Shield, 
+  Plane, 
+  ChevronRight 
+} from 'lucide-react';
+
+// Mapping des icônes par catégorie
+const categoryIcons = {
+  'AGRICULTURE': Sprout,
+  'INDUSTRIE CHIMIQUE': FlaskConical,
+  'PLASTIQUES & CAOUTCHOUC': Factory,
+  'AGROALIMENTAIRE': Utensils,
+  'MACHINES & EQUIPEMENTS': Cpu,
+  'MACHINES & APPAREILS ELECTRIQUES': Zap,
+  'PRODUITS MINERAUX NON METALLIQUES': Gem,
+  'SIDERURGIE & METALLURGIE': Hammer,
+  'PAPIER & CARTONS': Newspaper,
+  'AQUACULTURE, ELEVAGE & PECHE': Ship,
+  'TEXTILES, BONNETERIE & CONFECTION': ShoppingBag,
+  'TRAVAIL DU BOIS & ARTICLES EN BOIS': Leaf,
+  'ARTISANAT': Gem,
+  'MATERIELS DE TRANSPORT': Car,
+  'SERVICES': Briefcase,
+  'ENERGIE & MINES': Zap,
+  'EDITION': Newspaper,
+  'COMMERCE MULTIPLE': ShoppingBag,
+  'AMBASSADES D\'ALGERIE A L\'ETRANGER': Globe,
+  'AMBASSADES EN ALGERIE': Globe,
+  'ASSURANCES': Shield,
+  'TRANSPORTS': Plane,
+  'default': Building2
+};
+
+// Couleurs par catégorie (CHARTE GRAPHIQUE PRÉSERVÉE)
+const categoryColors = {
+  'AGRICULTURE': 'bg-green-100 text-green-800 border-green-200',
+  'INDUSTRIE CHIMIQUE': 'bg-purple-100 text-purple-800 border-purple-200',
+  'PLASTIQUES & CAOUTCHOUC': 'bg-blue-100 text-blue-800 border-blue-200',
+  'AGROALIMENTAIRE': 'bg-amber-100 text-amber-800 border-amber-200',
+  'MACHINES & EQUIPEMENTS': 'bg-indigo-100 text-indigo-800 border-indigo-200',
+  'MACHINES & APPAREILS ELECTRIQUES': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  'PRODUITS MINERAUX NON METALLIQUES': 'bg-gray-100 text-gray-800 border-gray-200',
+  'SIDERURGIE & METALLURGIE': 'bg-stone-100 text-stone-800 border-stone-200',
+  'PAPIER & CARTONS': 'bg-orange-100 text-orange-800 border-orange-200',
+  'AQUACULTURE, ELEVAGE & PECHE': 'bg-cyan-100 text-cyan-800 border-cyan-200',
+  'TEXTILES, BONNETERIE & CONFECTION': 'bg-pink-100 text-pink-800 border-pink-200',
+  'TRAVAIL DU BOIS & ARTICLES EN BOIS': 'bg-emerald-100 text-emerald-800 border-emerald-200',
+  'ARTISANAT': 'bg-amber-100 text-amber-800 border-amber-200',
+  'MATERIELS DE TRANSPORT': 'bg-sky-100 text-sky-800 border-sky-200',
+  'SERVICES': 'bg-teal-100 text-teal-800 border-teal-200',
+  'ENERGIE & MINES': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  'EDITION': 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200',
+  'COMMERCE MULTIPLE': 'bg-rose-100 text-rose-800 border-rose-200',
+  'AMBASSADES D\'ALGERIE A L\'ETRANGER': 'bg-red-100 text-red-800 border-red-200',
+  'AMBASSADES EN ALGERIE': 'bg-red-100 text-red-800 border-red-200',
+  'ASSURANCES': 'bg-violet-100 text-violet-800 border-violet-200',
+  'TRANSPORTS': 'bg-sky-100 text-sky-800 border-sky-200',
+  'default': 'bg-gray-100 text-gray-800 border-gray-200'
+};
+
+export default async function CategoriesPage() {
+  try {
+    // Initialiser le client Supabase
+    const supabase = await createServerSupabaseClient();
+    
+    if (!supabase || typeof supabase.from !== 'function') {
+      console.error('❌ Client Supabase non valide');
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+          <div className="container mx-auto px-4 py-12">
+            <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-6 max-w-3xl mx-auto">
+              <h2 className="text-red-800 font-semibold text-xl mb-2">Erreur de connexion</h2>
+              <p className="text-red-600">Impossible de se connecter à la base de données</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Récupérer les statistiques
+    const { data: stats, error } = await supabase
+      .from('category_stats')
+      .select('*');
+
+    if (error) {
+      console.error('❌ Erreur Supabase:', error);
+      throw error;
+    }
+
+    if (!stats || stats.length === 0) {
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+          <div className="container mx-auto px-4 py-12">
+            <div className="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-6 max-w-3xl mx-auto">
+              <h2 className="text-yellow-800 font-semibold text-xl mb-2">Aucune catégorie trouvée</h2>
+              <p className="text-yellow-600">Les données ne sont pas encore disponibles</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const totalEntries = stats.reduce((sum, cat) => sum + (cat.count || 0), 0);
+
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+        {/* Hero Section - CHARTE GRAPHIQUE VERT/ROUGE */}
+        <div className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="container mx-auto px-4 py-12">
+            <div className="max-w-4xl mx-auto text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                <span className="bg-gradient-to-r from-green-600 to-red-600 text-transparent bg-clip-text">
+                  Catégories d'Exportateurs
+                </span>
+              </h1>
+              <p className="text-xl text-gray-600 mb-4">
+                Explorez notre annuaire par secteur d'activité
+              </p>
+              <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-6 py-3">
+                <Building2 className="w-5 h-5 text-gray-600" />
+                <span className="text-gray-800 font-medium">
+                  {totalEntries} entreprises référencées
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Grille des catégories */}
+        <div className="container mx-auto px-4 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {stats.map((category) => {
+              const IconComponent = categoryIcons[category.category] || categoryIcons.default;
+              const colorClass = categoryColors[category.category] || categoryColors.default;
+              
+              return (
+                <Link
+                  key={category.category}
+                  href={`/exporters?category=${encodeURIComponent(category.category)}`}
+                  className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100"
+                >
+                  {/* Bande décorative VERT/ROUGE */}
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-red-500"></div>
+                  
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`p-3 rounded-xl ${colorClass.split(' ')[0]}`}>
+                        <IconComponent className={`w-8 h-8 ${colorClass.split(' ')[1]}`} />
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${colorClass}`}>
+                        {category.count || 0} entités
+                      </span>
+                    </div>
+                    
+                    <h2 className="text-xl font-semibold text-gray-800 mb-2 group-hover:text-green-600 transition-colors">
+                      {category.category}
+                    </h2>
+                    
+                    <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                      <div 
+                        className="bg-gradient-to-r from-green-500 to-red-500 h-2 rounded-full transition-all duration-500"
+                        style={{ 
+                          width: `${Math.min(100, ((category.count || 0) / Math.max(...stats.map(c => c.count))) * 100)}%` 
+                        }}
+                      ></div>
+                    </div>
+                    
+                    <div className="flex items-center text-sm text-gray-500">
+                      <span className="flex-1">
+                        {Math.round((category.count / totalEntries) * 100)}% du total
+                      </span>
+                      <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-green-500 group-hover:translate-x-1 transition-all" />
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+
+  } catch (error) {
+    console.error('❌ Erreur critique:', error);
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+        <div className="container mx-auto px-4 py-12">
+          <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-6 max-w-3xl mx-auto">
+            <h2 className="text-red-800 font-semibold text-xl mb-2">Erreur inattendue</h2>
+            <p className="text-red-600 mb-2">Une erreur est survenue lors du chargement des catégories</p>
+            <pre className="bg-red-100 p-3 rounded text-sm text-red-800 overflow-auto">
+              {error.message || 'Erreur inconnue'}
+            </pre>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
