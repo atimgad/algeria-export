@@ -55,4 +55,5 @@ export default async function AnalyticsPage({ params: { lang } = { lang: 'fr' } 
       </div>
     );
   }
+// Version finale absolue - 2 Mars 2026 - Cache purgé
 }
