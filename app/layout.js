@@ -20,16 +20,16 @@ export const metadata = {
   description: 'La vitrine d\'excellence du commerce algérien et africain',
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children, params: { lang } = { lang: 'fr' } }) {
   return (
-    <html lang="fr">
+    <html lang={lang}>
       <body className={inter.className}>
         {/* Navigation */}
         <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-16">
               {/* Logo */}
-              <Link href="/" className="flex items-center gap-2">
+              <Link href={`/${lang}`} className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-red-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-xl">AE</span>
                 </div>
@@ -40,27 +40,27 @@ export default function RootLayout({ children }) {
 
               {/* Navigation Links */}
               <div className="hidden md:flex items-center gap-1">
-                <Link href="/" className="px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2 text-gray-700">
+                <Link href={`/${lang}`} className="px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2 text-gray-700">
                   <Home className="w-4 h-4" />
                   <span>Accueil</span>
                 </Link>
-                <Link href="/categories" className="px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2 text-gray-700">
+                <Link href={`/${lang}/categories`} className="px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2 text-gray-700">
                   <LayoutGrid className="w-4 h-4" />
                   <span>Catégories</span>
                 </Link>
-                <Link href="/exporters" className="px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2 text-gray-700">
+                <Link href={`/${lang}/exporters`} className="px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2 text-gray-700">
                   <Users className="w-4 h-4" />
                   <span>Exportateurs</span>
                 </Link>
-                <Link href="/south-south" className="px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2 text-gray-700">
+                <Link href={`/${lang}/south-south`} className="px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2 text-gray-700">
                   <Globe2 className="w-4 h-4" />
                   <span>Sud-Sud</span>
                 </Link>
-                <Link href="/president-word" className="px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2 text-gray-700">
+                <Link href={`/${lang}/president-word`} className="px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2 text-gray-700">
                   <Award className="w-4 h-4" />
                   <span>Mot du Président</span>
                 </Link>
-                <Link href="/stats/analytics" className="px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2 text-gray-700">
+                <Link href={`/${lang}/stats/analytics`} className="px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2 text-gray-700">
                   <BarChart3 className="w-4 h-4" />
                   <span>Statistiques</span>
                 </Link>
@@ -72,14 +72,14 @@ export default function RootLayout({ children }) {
                 
                 <div className="hidden sm:flex items-center gap-2">
                   <Link 
-                    href="/login" 
+                    href={`/${lang}/login`} 
                     className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg flex items-center gap-2"
                   >
                     <LogIn className="w-4 h-4" />
                     <span>Connexion</span>
                   </Link>
                   <Link 
-                    href="/register" 
+                    href={`/${lang}/register`} 
                     className="px-4 py-2 bg-gradient-to-r from-green-600 to-red-600 text-white rounded-lg flex items-center gap-2 hover:shadow-lg transition"
                   >
                     <UserPlus className="w-4 h-4" />
@@ -123,20 +123,20 @@ export default function RootLayout({ children }) {
               <div>
                 <h3 className="font-bold mb-4">Navigation</h3>
                 <ul className="space-y-2 text-gray-400">
-                  <li><Link href="/" className="hover:text-white">Accueil</Link></li>
-                  <li><Link href="/categories" className="hover:text-white">Catégories</Link></li>
-                  <li><Link href="/exporters" className="hover:text-white">Exportateurs</Link></li>
-                  <li><Link href="/south-south" className="hover:text-white">Commerce Sud-Sud</Link></li>
+                  <li><Link href={`/${lang}`} className="hover:text-white">Accueil</Link></li>
+                  <li><Link href={`/${lang}/categories`} className="hover:text-white">Catégories</Link></li>
+                  <li><Link href={`/${lang}/exporters`} className="hover:text-white">Exportateurs</Link></li>
+                  <li><Link href={`/${lang}/south-south`} className="hover:text-white">Commerce Sud-Sud</Link></li>
                 </ul>
               </div>
               
               <div>
                 <h3 className="font-bold mb-4">Informations</h3>
                 <ul className="space-y-2 text-gray-400">
-                  <li><Link href="/president-word" className="hover:text-white">Mot du Président</Link></li>
-                  <li><Link href="/stats/analytics" className="hover:text-white">Statistiques</Link></li>
-                  <li><Link href="/strategic-pillars" className="hover:text-white">Stratégie 2035</Link></li>
-                  <li><Link href="/about" className="hover:text-white">À propos</Link></li>
+                  <li><Link href={`/${lang}/president-word`} className="hover:text-white">Mot du Président</Link></li>
+                  <li><Link href={`/${lang}/stats/analytics`} className="hover:text-white">Statistiques</Link></li>
+                  <li><Link href={`/${lang}/strategic-pillars`} className="hover:text-white">Stratégie 2035</Link></li>
+                  <li><Link href={`/${lang}/about`} className="hover:text-white">À propos</Link></li>
                 </ul>
               </div>
               
