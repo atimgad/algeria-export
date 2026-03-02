@@ -1,69 +1,56 @@
-import { createServerSupabaseClient } from '@/utils/supabase/client'
-import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard'
-
-export const dynamic = 'force-dynamic'
-
-async function getStats() {
-  const supabase = await createServerSupabaseClient()
-
-  // Récupérer les statistiques
-  const { count: totalViews } = await supabase
-    .from('page_views')
-    .select('*', { count: 'exact', head: true })
-
-  const { data: uniqueVisitorsData } = await supabase
-    .from('page_views')
-    .select('visitor_id', { count: 'exact', head: false })
-    .limit(1000)
-
-  const uniqueVisitors = new Set(uniqueVisitorsData?.map(v => v.visitor_id)).size
-
-  const { data: topPages } = await supabase
-    .from('page_views')
-    .select('path, count')
-    .order('count', { ascending: false })
-    .limit(10)
-
-  const { data: viewsByDay } = await supabase
-    .from('page_views')
-    .select('date, count')
-    .order('date', { ascending: false })
-    .limit(30)
-
-  const { data: viewsBySource } = await supabase
-    .from('page_views')
-    .select('source, count')
-    .order('count', { ascending: false })
-    .limit(10)
-
-  const { data: viewsByCategory } = await supabase
-    .from('page_views')
-    .select('category, count')
-    .order('count', { ascending: false })
-    .limit(10)
-
-  return {
-    totalViews: totalViews || 0,
-    uniqueVisitors,
-    topPages: topPages || [],
-    viewsByDay: viewsByDay || [],
-    viewsBySource: viewsBySource || [],
-    viewsByCategory: viewsByCategory || []
-  }
-}
+import { createServerSupabaseClient } from '@/utils/supabase/server';
+import AnalyticsDashboard from '@/components/analytics/AnalyticsDashboard';
 
 export default async function AnalyticsPage() {
-  const stats = await getStats()
+  try {
+    const supabase = await createServerSupabaseClient();
+    
+    if (!supabase) {
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-green-50 to-white p-8">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <h2 className="text-red-800 font-semibold">Erreur de connexion</h2>
+            <p className="text-red-600">Impossible de se connecter à la base de données</p>
+          </div>
+        </div>
+      );
+    }
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">
-          <span className="text-green-600">Statistiques</span>{' '}
-          <span className="text-red-600">Export</span>
-        </h1>
-        <AnalyticsDashboard initialStats={stats} />
+    const { data: categoryStats, error: catError } = await supabase
+      .from('category_stats')
+      .select('*');
+
+    if (catError) {
+      console.error('Erreur catégories:', catError);
+      throw catError;
+    }
+
+    const { count, error: countError } = await supabase
+      .from('official_directory')
+      .select('*', { count: 'exact', head: true });
+
+    if (countError) {
+      console.error('Erreur comptage:', countError);
+      throw countError;
+    }
+
+    return (
+      <AnalyticsDashboard 
+        categoryStats={categoryStats || []} 
+        totalCount={count || 0}
+      />
+    );
+
+  } catch (error) {
+    console.error('Erreur critique stats:', error);
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white p-8">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-3xl mx-auto">
+          <h2 className="text-red-800 font-semibold text-xl mb-2">Erreur de chargement</h2>
+          <p className="text-red-600">Une erreur est survenue lors du chargement des statistiques</p>
+          <p className="text-gray-500 text-sm mt-2">L'équipe technique a été notifiée.</p>
+        </div>
       </div>
-    </div>
-  )
+    );
+  }
 }
