@@ -40,17 +40,17 @@ export default async function AnalyticsPage({ params: { lang } = { lang: 'fr' } 
     // Construction de l'objet stats conforme au type Stats attendu
     const stats = {
       totalViews: totalCount || 0,
-      uniqueVisitors: Math.floor((totalCount || 0) * 0.8), // Approximation 80% de visiteurs uniques
-      viewsByDay: [], // À implémenter si nécessaire
+      uniqueVisitors: Math.floor((totalCount || 0) * 0.8),
+      viewsByDay: [],
       topPages: (categoryStats || []).map(cat => ({
         path: cat.category,
         count: cat.count || 0
       })),
       viewsBySource: [
-        { name: 'Direct', value: 40 },
-        { name: 'Recherche', value: 35 },
-        { name: 'Réseaux sociaux', value: 15 },
-        { name: 'Partenaires', value: 10 }
+        { source: 'Direct', count: 40 },
+        { source: 'Recherche', count: 35 },
+        { source: 'Réseaux sociaux', count: 15 },
+        { source: 'Partenaires', count: 10 }
       ],
       viewsByCategory: (categoryStats || []).map(cat => ({
         name: cat.category,
