@@ -58,6 +58,7 @@ export default async function AnalyticsPage({ params: { lang } = { lang: 'fr' } 
       }))
     };
 
+    console.log('Stats envoyées:', JSON.stringify(stats, null, 2));
     return <AnalyticsDashboard initialStats={stats} />;
 
   } catch (error) {
