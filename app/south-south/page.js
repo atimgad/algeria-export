@@ -11,6 +11,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function SouthSouthPage() {
   // Initialisation du client Supabase avec gestion d'erreur
   const supabase = await createServerSupabaseClient();
