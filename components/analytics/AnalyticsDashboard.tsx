@@ -79,7 +79,10 @@ export function AnalyticsDashboard({ initialStats }: { initialStats: Stats }) {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ payload, percent }) => `${payload.source} ${(percent * 100).toFixed(0)}%`}
+                  label={({ payload, percent }) => {
+                    const percentage = percent ? (percent * 100).toFixed(0) : '0';
+                    return `${payload.source} ${percentage}%`;
+                  }}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="count"
