@@ -2,6 +2,8 @@
 import { createServerSupabaseClient } from '@/utils/supabase/server';
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AnalyticsPage({ params: { lang } = { lang: 'fr' } }) {
   try {
     const supabase = await createServerSupabaseClient();
