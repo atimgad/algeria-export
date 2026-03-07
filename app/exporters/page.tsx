@@ -1,164 +1,118 @@
-import { createServerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import Image from 'next/image'
-import Link from 'next/link'
-import { MapPin, Package, Award, Building2, Search } from 'lucide-react'
-import SecteurFilter from './components/SecteurFilter'
+// app/exporters/page.tsx
+import { createServerSupabaseClient } from '@/utils/supabase/server';
+import Link from 'next/link';
+import { Building2, Filter, Search, ChevronRight } from 'lucide-react';
 
-export default async function ExportersPage() {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: any) {
-          cookieStore.set(name, value, options)
-        },
-        remove(name: string, options: any) {
-          cookieStore.set(name, '', options)
-        },
-      },
-    }
-  )
+export default async function ExportersPage({ searchParams }: { searchParams: { category?: string } }) {
+  const supabase = await createServerSupabaseClient();
   
-  const { data: exporters, error } = await supabase
-    .from('profiles')
-    .select(`
-      *,
-      products:products(*)
-    `)
-    .eq('user_type', 'exporter')
-    .eq('verification_status', 'verified')
-    .order('company_name')
-    .limit(5000);
-
-  const secteurs = Array.from(new Set(exporters?.map(e => e.activity_sector).filter(Boolean) || []));
+  let query = supabase
+    .from('official_directory')
+    .select('*');
+  
+  if (searchParams.category) {
+    query = query.eq('category', searchParams.category);
+  }
+  
+  const { data: exporters } = await query.limit(50);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-[#003153] to-[#2E7D32] text-white py-16">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Exportateurs Algériens Certifiés</h1>
-          <p className="text-xl opacity-90 max-w-3xl">
-            Découvrez notre réseau de fournisseurs vérifiés, leaders dans leurs secteurs respectifs
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+      {/* Hero Section - CHARTE GRAPHIQUE EXACTE */}
+      <div className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="container mx-auto px-4 py-16">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-green-600 to-red-600 text-transparent bg-clip-text">
+                Exportateurs Algériens Certifiés
+              </span>
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Découvrez notre réseau de fournisseurs vérifiés, leaders dans leurs secteurs respectifs
+            </p>
+            
+            {/* Badge "Vérifiés" */}
+            <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-6 py-3 rounded-full text-sm font-medium mb-12">
+              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+              {exporters?.length || 0} exportateurs certifiés
+            </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar - Filtres */}
-          <aside className="lg:w-64">
-            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
-              <h2 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                <Search className="h-5 w-5 text-[#2E7D32]" />
+            {/* Barre de recherche et filtres */}
+            <div className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto">
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Rechercher un exportateur..."
+                  className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm"
+                />
+              </div>
+              <button className="px-8 py-4 bg-gradient-to-r from-green-600 to-red-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:scale-105 flex items-center justify-center gap-2">
+                <Filter className="w-5 h-5" />
                 Filtres
-              </h2>
-              <SecteurFilter secteurs={secteurs} />
+              </button>
             </div>
-          </aside>
-
-          {/* Liste des exportateurs */}
-          <div className="flex-1">
-            {/* En-tête avec compteur */}
-            <div className="bg-white rounded-xl shadow-sm p-4 mb-6 flex justify-between items-center">
-              <p className="text-gray-600">
-                <span className="font-bold text-[#003153]">{exporters?.length || 0}</span> exportateurs certifiés
-              </p>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Award className="h-4 w-4 text-[#2E7D32]" />
-                <span>Vérifiés par AlgeriaExport</span>
-              </div>
-            </div>
-
-            {/* Grille des exportateurs */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {exporters?.map((exporter) => (
-                <Link 
-                  key={exporter.id}
-                  href={`/exporters/${exporter.id}`}
-                  className="bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 overflow-hidden group"
-                >
-                  {/* En-tête avec logo/initiale */}
-                  <div className="p-6 pb-4">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-16 h-16 bg-gradient-to-br from-[#003153] to-[#2E7D32] rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-md">
-                        {exporter.company_name?.charAt(0) || 'E'}
-                      </div>
-                      <span className="text-xs bg-[#2E7D32]/10 text-[#2E7D32] px-3 py-1 rounded-full font-medium">
-                        Certifié
-                      </span>
-                    </div>
-
-                    <h3 className="text-xl font-bold text-[#003153] mb-1 group-hover:text-[#2E7D32] transition">
-                      {exporter.company_name}
-                    </h3>
-                    
-                    {exporter.activity_sector && (
-                      <p className="text-sm text-[#2E7D32] mb-3 font-medium">
-                        {exporter.activity_sector}
-                      </p>
-                    )}
-
-                    {exporter.description && (
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                        {exporter.description}
-                      </p>
-                    )}
-
-                    {/* Localisation */}
-                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-                      <MapPin className="h-4 w-4 text-[#2E7D32]" />
-                      <span>{exporter.city || 'Algérie'}</span>
-                    </div>
-
-                    {/* Produits */}
-                    {exporter.products && exporter.products.length > 0 && (
-                      <div className="border-t border-gray-100 pt-4 mt-2">
-                        <p className="text-xs text-gray-400 mb-2 flex items-center gap-1">
-                          <Package className="h-3 w-3" />
-                          Produits principaux
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {exporter.products.slice(0, 3).map((product: any) => (
-                            <span 
-                              key={product.id}
-                              className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
-                            >
-                              {product.name}
-                            </span>
-                          ))}
-                          {exporter.products.length > 3 && (
-                            <span className="text-xs text-gray-400">
-                              +{exporter.products.length - 3}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            {(!exporters || exporters.length === 0) && (
-              <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-                <Building2 className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">Aucun exportateur trouvé</h3>
-                <p className="text-gray-500">
-                  Il n'y a pas encore d'exportateurs certifiés dans cette catégorie.
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </div>
+
+      {/* Liste des exportateurs */}
+      <div className="container mx-auto px-4 py-16">
+        {(!exporters || exporters.length === 0) ? (
+          <div className="text-center py-20">
+            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Building2 className="w-12 h-12 text-green-600" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-800 mb-3">
+              Aucun exportateur trouvé
+            </h2>
+            <p className="text-lg text-gray-600 max-w-md mx-auto">
+              {searchParams.category 
+                ? `Aucun exportateur dans la catégorie ${searchParams.category}`
+                : 'Aucun exportateur disponible pour le moment'}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {exporters.map((exporter) => (
+              <Link
+                key={exporter.id}
+                href={`/exporters/${exporter.id}`}
+                className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100"
+              >
+                {/* Bande décorative VERT/ROUGE */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-red-500"></div>
+                
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="p-3 bg-green-100 rounded-xl">
+                      <Building2 className="w-6 h-6 text-green-800" />
+                    </div>
+                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                      {exporter.category || 'Non catégorisé'}
+                    </span>
+                  </div>
+                  
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2 group-hover:text-green-600 transition-colors line-clamp-2">
+                    {exporter.name}
+                  </h3>
+                  
+                  <p className="text-gray-500 text-sm mb-4 line-clamp-2">
+                    {exporter.address || 'Adresse non disponible'}
+                  </p>
+                  
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <span className="text-sm text-gray-500">
+                      {exporter.phone?.[0] || 'Contactez-nous'}
+                    </span>
+                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-green-500 group-hover:translate-x-1 transition-all" />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
-  )
+  );
 }
