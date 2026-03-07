@@ -1,70 +1,72 @@
 // app/exporters/page.tsx
 import { createServerSupabaseClient } from '@/utils/supabase/server';
 import Link from 'next/link';
-import { Building2, Filter, Search, ChevronRight } from 'lucide-react';
+import { Building2, Filter, Search, ChevronRight, Shield, Star } from 'lucide-react';
 
-// Catégories à exclure (adresses utiles)
-const excludedCategories = [
-  'BANQUES',
-  'CHAMBRES D\'AGRICULTURE',
-  'CHAMBRES D\'ARTISANAT',
-  'CHAMBRES DE COMMERCE ET D\'INDUSTRIE',
-  'CHAMBRES DE LA PÊCHE',
-  'DIRECTIONS DE COMMERCE',
-  'ENTREPRISES PORTUAIRES',
-  'ORGANISMES OFFICIELS',
-  'AMBASSADES D\'ALGERIE A L\'ETRANGER',
-  'AMBASSADES EN ALGERIE',
-  'ASSURANCES'
-];
-
-export default async function ExportersPage({ searchParams }: { searchParams: { category?: string } }) {
+export default async function ExportersPage({ searchParams }: { searchParams: { 
+  category?: string,
+  certified?: string,
+  search?: string 
+}}) {
   const supabase = await createServerSupabaseClient();
   
-  // Vérification que supabase est initialisé
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-        <div className="container mx-auto px-4 py-12">
-          <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-6 max-w-3xl mx-auto">
-            <h2 className="text-red-800 font-semibold text-xl mb-2">Erreur de connexion</h2>
-            <p className="text-red-600">Impossible de se connecter à la base de données</p>
-          </div>
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white p-8">
+        <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-6 max-w-3xl mx-auto">
+          <h2 className="text-red-800 font-semibold text-xl mb-2">Erreur de connexion</h2>
+          <p className="text-red-600">Impossible de se connecter à la base de données</p>
         </div>
       </div>
     );
   }
   
+  // Construction de la requête
   let query = supabase
     .from('official_directory')
-    .select('*')
-    .not('category', 'in', `(${excludedCategories.map(c => `'${c.replace(/'/g, "''")}'`).join(',')})`);
+    .select('*');
   
   if (searchParams.category) {
     query = query.eq('category', searchParams.category);
   }
   
-  const { data: exporters } = await query.limit(50);
+  // Filtre optionnel pour les exportateurs certifiés
+  if (searchParams.certified === 'true') {
+    query = query.eq('is_exporter', true);
+  }
+  
+  // Recherche par nom, NIF ou produits
+  if (searchParams.search) {
+    query = query.or(`name.ilike.%${searchParams.search}%,nif.ilike.%${searchParams.search}%,products.cs.{${searchParams.search}}`);
+  }
+  
+  const { data: exporters } = await query;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-      {/* Hero Section - CHARTE GRAPHIQUE EXACTE */}
+      {/* Hero Section */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-green-600 to-red-600 text-transparent bg-clip-text">
-                Exportateurs Algériens Certifiés
+                Exportateurs Algériens
               </span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Découvrez notre réseau de fournisseurs vérifiés, leaders dans leurs secteurs respectifs
+              Annuaire des exportateurs potentiels et certifiés
             </p>
             
-            {/* Badge "Vérifiés" */}
-            <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-6 py-3 rounded-full text-sm font-medium mb-12">
-              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-              {exporters?.length || 0} exportateurs certifiés
+            {/* Statistiques */}
+            <div className="flex flex-wrap justify-center gap-4 mb-12">
+              <div className="bg-green-100 text-green-800 px-6 py-3 rounded-full text-sm font-medium flex items-center gap-2">
+                <Building2 className="w-4 h-4" />
+                {exporters?.length || 0} au total
+              </div>
+              <div className="bg-green-500 text-white px-6 py-3 rounded-full text-sm font-medium flex items-center gap-2">
+                <Shield className="w-4 h-4" />
+                {exporters?.filter(e => e.is_exporter).length || 0} certifiés
+              </div>
             </div>
 
             {/* Barre de recherche et filtres */}
@@ -73,8 +75,10 @@ export default async function ExportersPage({ searchParams }: { searchParams: { 
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Rechercher un exportateur..."
+                  placeholder="Rechercher par nom, NIF ou produit..."
                   className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm"
+                  name="search"
+                  defaultValue={searchParams.search}
                 />
               </div>
               <button className="px-8 py-4 bg-gradient-to-r from-green-600 to-red-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:scale-105 flex items-center justify-center gap-2">
@@ -97,9 +101,7 @@ export default async function ExportersPage({ searchParams }: { searchParams: { 
               Aucun exportateur trouvé
             </h2>
             <p className="text-lg text-gray-600 max-w-md mx-auto">
-              {searchParams.category 
-                ? `Aucun exportateur dans la catégorie ${searchParams.category}`
-                : 'Aucun exportateur disponible pour le moment'}
+              Essayez de modifier vos filtres de recherche
             </p>
           </div>
         ) : (
@@ -110,7 +112,6 @@ export default async function ExportersPage({ searchParams }: { searchParams: { 
                 href={`/exporters/${exporter.id}`}
                 className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100"
               >
-                {/* Bande décorative VERT/ROUGE */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-red-500"></div>
                 
                 <div className="p-6">
@@ -118,9 +119,17 @@ export default async function ExportersPage({ searchParams }: { searchParams: { 
                     <div className="p-3 bg-green-100 rounded-xl">
                       <Building2 className="w-6 h-6 text-green-800" />
                     </div>
-                    <span className="px-3 py-1 bg-green-500 text-white rounded-full text-sm font-medium">
-                      {exporter.category || 'Non catégorisé'}
-                    </span>
+                    <div className="flex gap-2">
+                      {exporter.is_exporter && (
+                        <span className="px-3 py-1 bg-green-500 text-white rounded-full text-sm font-medium flex items-center gap-1">
+                          <Shield className="w-3 h-3" />
+                          Certifié
+                        </span>
+                      )}
+                      <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                        {exporter.category || 'Non catégorisé'}
+                      </span>
+                    </div>
                   </div>
                   
                   <h3 className="text-xl font-semibold text-gray-800 mb-2 group-hover:text-green-600 transition-colors line-clamp-2">
