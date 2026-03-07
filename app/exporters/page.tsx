@@ -3,7 +3,7 @@ import { createServerSupabaseClient } from '@/utils/supabase/server';
 import Link from 'next/link';
 import { Building2, Filter, Search, ChevronRight, Shield } from 'lucide-react';
 
-// Liste stricte des catégories à exclure (adresses utiles)
+// Catégories à exclure (celles qui vont dans Adresses Utiles) - IDENTIQUE à categories/page.js
 const EXCLUDED_CATEGORIES = [
   'AMBASSADES D\'ALGERIE A L\'ETRANGER',
   'AMBASSADES EN ALGERIE',
@@ -16,7 +16,7 @@ const EXCLUDED_CATEGORIES = [
   'ENTREPRISES PORTUAIRES',
   'ORGANISMES OFFICIELS',
   'ASSURANCES',
-  'HÔTELS' // À ajouter quand la catégorie existera
+  'HÔTELS' // Pour le futur
 ];
 
 export default async function ExportersPage({ searchParams }: { searchParams: { 
@@ -44,7 +44,10 @@ export default async function ExportersPage({ searchParams }: { searchParams: {
     .not('category', 'in', `(${EXCLUDED_CATEGORIES.map(c => `'${c.replace(/'/g, "''")}'`).join(',')})`);
   
   if (searchParams.category) {
-    query = query.eq('category', searchParams.category);
+    // Vérifier que la catégorie demandée n'est pas dans la liste des exclues
+    if (!EXCLUDED_CATEGORIES.includes(searchParams.category)) {
+      query = query.eq('category', searchParams.category);
+    }
   }
   
   // Filtre optionnel pour les exportateurs certifiés
