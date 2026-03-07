@@ -9,69 +9,55 @@ import {
   Banknote,
   Globe2,
   Shield,
-  Truck,
   Ship,
   Factory,
-  Users,
-  Briefcase,
   MapPin
 } from 'lucide-react';
 
-// Version simplifiée des traductions
 const translations = {
   fr: {
     title: "Adresses Utiles",
     subtitle: "Organismes publics, consulaires et infrastructures",
     total: "organismes référencés",
-    entities: "entités",
-    viewAll: "Voir toutes les adresses",
-    back: "Retour aux catégories"
+    entities: "entités"
   },
   en: {
     title: "Useful Addresses",
     subtitle: "Public institutions, consular bodies and infrastructure",
     total: "organizations listed",
-    entities: "entities",
-    viewAll: "View all addresses",
-    back: "Back to categories"
+    entities: "entities"
   }
 };
 
-// Mapping des catégories vers les icônes
+// Mapping des catégories vers les icônes (toutes de la même famille)
 const categoryIcons = {
   'BANQUES': Banknote,
   'CHAMBRES D\'AGRICULTURE': Landmark,
   'CHAMBRES D\'ARTISANAT': Landmark,
   'CHAMBRES DE COMMERCE ET D\'INDUSTRIE': Landmark,
-  'CHAMBRES DE LA PÊCHE': Landmark,
+  'CHAMBRES DE LA PÊCHE': Ship,
   'DIRECTIONS DE COMMERCE': Building2,
   'ENTREPRISES PORTUAIRES': Anchor,
   'ORGANISMES OFFICIELS': Globe2,
-  'GROUPES INDUSTRIELS': Factory,
   'AMBASSADES D\'ALGERIE A L\'ETRANGER': Globe2,
   'AMBASSADES EN ALGERIE': Globe2,
   'ASSURANCES': Shield,
-  'TRANSPORTS': Truck,
-  'HÔTELS': Building2,
   'default': Building2
 };
 
-// Couleurs par catégorie (charte graphique)
+// Couleurs par catégorie (charte graphique - fonds colorés)
 const categoryColors = {
-  'BANQUES': 'bg-green-100 text-green-800 border-green-200',
-  'CHAMBRES D\'AGRICULTURE': 'bg-emerald-100 text-emerald-800 border-emerald-200',
+  'BANQUES': 'bg-emerald-100 text-emerald-800 border-emerald-200',
+  'CHAMBRES D\'AGRICULTURE': 'bg-green-100 text-green-800 border-green-200',
   'CHAMBRES D\'ARTISANAT': 'bg-amber-100 text-amber-800 border-amber-200',
   'CHAMBRES DE COMMERCE ET D\'INDUSTRIE': 'bg-blue-100 text-blue-800 border-blue-200',
   'CHAMBRES DE LA PÊCHE': 'bg-cyan-100 text-cyan-800 border-cyan-200',
   'DIRECTIONS DE COMMERCE': 'bg-purple-100 text-purple-800 border-purple-200',
   'ENTREPRISES PORTUAIRES': 'bg-sky-100 text-sky-800 border-sky-200',
   'ORGANISMES OFFICIELS': 'bg-indigo-100 text-indigo-800 border-indigo-200',
-  'GROUPES INDUSTRIELS': 'bg-stone-100 text-stone-800 border-stone-200',
   'AMBASSADES D\'ALGERIE A L\'ETRANGER': 'bg-red-100 text-red-800 border-red-200',
   'AMBASSADES EN ALGERIE': 'bg-red-100 text-red-800 border-red-200',
   'ASSURANCES': 'bg-violet-100 text-violet-800 border-violet-200',
-  'TRANSPORTS': 'bg-orange-100 text-orange-800 border-orange-200',
-  'HÔTELS': 'bg-pink-100 text-pink-800 border-pink-200',
   'default': 'bg-gray-100 text-gray-800 border-gray-200'
 };
 
@@ -96,7 +82,6 @@ export default async function AdressesUtilesPage({ params: { lang } = { lang: 'f
       );
     }
 
-    // Récupérer les statistiques par catégorie pour les adresses utiles
     const { data: stats, error } = await supabase
       .from('category_stats')
       .select('*');
@@ -106,7 +91,6 @@ export default async function AdressesUtilesPage({ params: { lang } = { lang: 'f
       throw error;
     }
 
-    // Filtrer uniquement les catégories d'adresses utiles
     const adressesCategories = [
       'BANQUES',
       'CHAMBRES D\'AGRICULTURE',
@@ -116,11 +100,9 @@ export default async function AdressesUtilesPage({ params: { lang } = { lang: 'f
       'DIRECTIONS DE COMMERCE',
       'ENTREPRISES PORTUAIRES',
       'ORGANISMES OFFICIELS',
-      'GROUPES INDUSTRIELS',
       'AMBASSADES D\'ALGERIE A L\'ETRANGER',
       'AMBASSADES EN ALGERIE',
-      'ASSURANCES',
-      'TRANSPORTS'
+      'ASSURANCES'
     ];
 
     const filteredStats = (stats || [])
@@ -131,7 +113,7 @@ export default async function AdressesUtilesPage({ params: { lang } = { lang: 'f
 
     return (
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-        {/* Hero Section */}
+        {/* Hero Section - CHARTE GRAPHIQUE */}
         <div className="bg-white border-b border-gray-200 shadow-sm">
           <div className="container mx-auto px-4 py-12">
             <div className="max-w-4xl mx-auto text-center">
@@ -153,7 +135,7 @@ export default async function AdressesUtilesPage({ params: { lang } = { lang: 'f
           </div>
         </div>
 
-        {/* Grille des catégories */}
+        {/* Grille des catégories avec icônes uniformes */}
         <div className="container mx-auto px-4 py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredStats.map((category) => {
@@ -166,11 +148,12 @@ export default async function AdressesUtilesPage({ params: { lang } = { lang: 'f
                   href={`/${lang}/exporters?category=${encodeURIComponent(category.category)}`}
                   className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100"
                 >
-                  {/* Bande décorative */}
+                  {/* Bande décorative VERT/ROUGE */}
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-red-500"></div>
                   
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
+                      {/* Fond coloré pour l'icône */}
                       <div className={`p-3 rounded-xl ${colorClass.split(' ')[0]}`}>
                         <IconComponent className={`w-6 h-6 ${colorClass.split(' ')[1]}`} />
                       </div>
