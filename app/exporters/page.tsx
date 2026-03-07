@@ -6,6 +6,20 @@ import { Building2, Filter, Search, ChevronRight } from 'lucide-react';
 export default async function ExportersPage({ searchParams }: { searchParams: { category?: string } }) {
   const supabase = await createServerSupabaseClient();
   
+  // Vérification que supabase est initialisé
+  if (!supabase) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+        <div className="container mx-auto px-4 py-12">
+          <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-6 max-w-3xl mx-auto">
+            <h2 className="text-red-800 font-semibold text-xl mb-2">Erreur de connexion</h2>
+            <p className="text-red-600">Impossible de se connecter à la base de données</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
   let query = supabase
     .from('official_directory')
     .select('*');
@@ -88,7 +102,7 @@ export default async function ExportersPage({ searchParams }: { searchParams: { 
                     <div className="p-3 bg-green-100 rounded-xl">
                       <Building2 className="w-6 h-6 text-green-800" />
                     </div>
-                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    <span className="px-3 py-1 bg-green-500 text-white rounded-full text-sm font-medium">
                       {exporter.category || 'Non catégorisé'}
                     </span>
                   </div>
