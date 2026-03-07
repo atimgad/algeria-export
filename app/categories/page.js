@@ -1,8 +1,41 @@
 // app/categories/page.js
 import { createServerSupabaseClient } from '@/utils/supabase/server';
-import { getTranslations } from '@/lib/useTranslations';
 import Link from 'next/link';
 import { Building2, ChevronRight } from 'lucide-react';
+
+// Version simplifiée des traductions (pas de getTranslations)
+const translations = {
+  fr: {
+    categories: {
+      title: "Catégories d'Exportateurs",
+      subtitle: "Explorez notre annuaire par secteur d'activité",
+      total: "entreprises référencées",
+      entities: "entités",
+      percentOfTotal: "% du total",
+      noData: "Aucune catégorie trouvée",
+      error: "Impossible de charger les catégories"
+    },
+    errors: {
+      connection: "Erreur de connexion",
+      database: "Impossible de se connecter à la base de données"
+    }
+  },
+  en: {
+    categories: {
+      title: "Exporters Categories",
+      subtitle: "Explore our directory by business sector",
+      total: "registered companies",
+      entities: "entities",
+      percentOfTotal: "% of total",
+      noData: "No categories found",
+      error: "Unable to load categories"
+    },
+    errors: {
+      connection: "Connection error",
+      database: "Unable to connect to database"
+    }
+  }
+};
 
 const categoryIcons = {
   'AGRICULTURE': '🌾',
@@ -58,7 +91,16 @@ const categoryColors = {
 
 export default async function CategoriesPage({ params: { lang } = { lang: 'fr' } }) {
   try {
-    const { t } = await getTranslations(lang);
+    const t = (key) => {
+      const keys = key.split('.');
+      let value = translations[lang] || translations.fr;
+      for (const k of keys) {
+        value = value?.[k];
+        if (!value) break;
+      }
+      return value || key;
+    };
+
     const supabase = await createServerSupabaseClient();
     
     if (!supabase || typeof supabase.from !== 'function') {
@@ -95,7 +137,7 @@ export default async function CategoriesPage({ params: { lang } = { lang: 'fr' }
 
     return (
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-        {/* Hero Section */}
+        {/* Hero Section - CHARTE GRAPHIQUE VERT/ROUGE */}
         <div className="bg-white border-b border-gray-200 shadow-sm">
           <div className="container mx-auto px-4 py-12">
             <div className="max-w-4xl mx-auto text-center">
@@ -130,7 +172,7 @@ export default async function CategoriesPage({ params: { lang } = { lang: 'fr' }
                   href={`/${lang}/exporters?category=${encodeURIComponent(category.category)}`}
                   className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100"
                 >
-                  {/* Bande décorative verte/rouge */}
+                  {/* Bande décorative VERT/ROUGE */}
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-red-500"></div>
                   
                   <div className="p-6">
