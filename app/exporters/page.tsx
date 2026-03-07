@@ -3,22 +3,6 @@ import { createServerSupabaseClient } from '@/utils/supabase/server';
 import Link from 'next/link';
 import { Building2, Filter, Search, ChevronRight, Shield } from 'lucide-react';
 
-// Catégories à exclure (celles qui vont dans Adresses Utiles) - IDENTIQUE à categories/page.js
-const EXCLUDED_CATEGORIES = [
-  'AMBASSADES D\'ALGERIE A L\'ETRANGER',
-  'AMBASSADES EN ALGERIE',
-  'BANQUES',
-  'CHAMBRES D\'AGRICULTURE',
-  'CHAMBRES D\'ARTISANAT',
-  'CHAMBRES DE COMMERCE ET D\'INDUSTRIE',
-  'CHAMBRES DE LA PÊCHE',
-  'DIRECTIONS DE COMMERCE',
-  'ENTREPRISES PORTUAIRES',
-  'ORGANISMES OFFICIELS',
-  'ASSURANCES',
-  'HÔTELS' // Pour le futur
-];
-
 export default async function ExportersPage({ searchParams }: { searchParams: { 
   category?: string,
   certified?: string,
@@ -37,17 +21,14 @@ export default async function ExportersPage({ searchParams }: { searchParams: {
     );
   }
   
-  // Construction de la requête avec exclusion des adresses utiles
+  // Construction de la requête - UNIQUEMENT LES ENTREPRISES (entity_type = 'company')
   let query = supabase
     .from('official_directory')
     .select('*')
-    .not('category', 'in', `(${EXCLUDED_CATEGORIES.map(c => `'${c.replace(/'/g, "''")}'`).join(',')})`);
+    .eq('entity_type', 'company');
   
   if (searchParams.category) {
-    // Vérifier que la catégorie demandée n'est pas dans la liste des exclues
-    if (!EXCLUDED_CATEGORIES.includes(searchParams.category)) {
-      query = query.eq('category', searchParams.category);
-    }
+    query = query.eq('category', searchParams.category);
   }
   
   // Filtre optionnel pour les exportateurs certifiés
@@ -64,7 +45,7 @@ export default async function ExportersPage({ searchParams }: { searchParams: {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-      {/* Hero Section */}
+      {/* Hero Section - CHARTE GRAPHIQUE */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto text-center">
@@ -132,6 +113,7 @@ export default async function ExportersPage({ searchParams }: { searchParams: {
                 href={`/exporters/${exporter.id}`}
                 className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100"
               >
+                {/* Bande décorative VERT/ROUGE */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-red-500"></div>
                 
                 <div className="p-6">
