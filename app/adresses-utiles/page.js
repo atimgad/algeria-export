@@ -44,78 +44,66 @@ const categoryIcons = {
   'default': Building2
 };
 
-// Couleurs par catégorie (pour l'icône ET le badge)
+// Palette unique par catégorie (inspirée de Chambre d'Agriculture)
 const categoryColors = {
   'BANQUES': {
     bg: 'bg-emerald-100',
-    text: 'text-emerald-800',
-    border: 'border-emerald-200',
+    icon: 'text-emerald-800',
     badge: 'bg-emerald-500 text-white'
   },
   'CHAMBRES D\'AGRICULTURE': {
     bg: 'bg-green-100',
-    text: 'text-green-800',
-    border: 'border-green-200',
+    icon: 'text-green-800',
     badge: 'bg-green-500 text-white'
   },
   'CHAMBRES D\'ARTISANAT': {
     bg: 'bg-amber-100',
-    text: 'text-amber-800',
-    border: 'border-amber-200',
+    icon: 'text-amber-800',
     badge: 'bg-amber-500 text-white'
   },
   'CHAMBRES DE COMMERCE ET D\'INDUSTRIE': {
     bg: 'bg-blue-100',
-    text: 'text-blue-800',
-    border: 'border-blue-200',
+    icon: 'text-blue-800',
     badge: 'bg-blue-500 text-white'
   },
   'CHAMBRES DE LA PÊCHE': {
     bg: 'bg-cyan-100',
-    text: 'text-cyan-800',
-    border: 'border-cyan-200',
+    icon: 'text-cyan-800',
     badge: 'bg-cyan-500 text-white'
   },
   'DIRECTIONS DE COMMERCE': {
     bg: 'bg-purple-100',
-    text: 'text-purple-800',
-    border: 'border-purple-200',
+    icon: 'text-purple-800',
     badge: 'bg-purple-500 text-white'
   },
   'ENTREPRISES PORTUAIRES': {
     bg: 'bg-sky-100',
-    text: 'text-sky-800',
-    border: 'border-sky-200',
+    icon: 'text-sky-800',
     badge: 'bg-sky-500 text-white'
   },
   'ORGANISMES OFFICIELS': {
     bg: 'bg-indigo-100',
-    text: 'text-indigo-800',
-    border: 'border-indigo-200',
+    icon: 'text-indigo-800',
     badge: 'bg-indigo-500 text-white'
   },
   'AMBASSADES D\'ALGERIE A L\'ETRANGER': {
     bg: 'bg-red-100',
-    text: 'text-red-800',
-    border: 'border-red-200',
+    icon: 'text-red-800',
     badge: 'bg-red-500 text-white'
   },
   'AMBASSADES EN ALGERIE': {
     bg: 'bg-red-100',
-    text: 'text-red-800',
-    border: 'border-red-200',
+    icon: 'text-red-800',
     badge: 'bg-red-500 text-white'
   },
   'ASSURANCES': {
     bg: 'bg-violet-100',
-    text: 'text-violet-800',
-    border: 'border-violet-200',
+    icon: 'text-violet-800',
     badge: 'bg-violet-500 text-white'
   },
   'default': {
     bg: 'bg-gray-100',
-    text: 'text-gray-800',
-    border: 'border-gray-200',
+    icon: 'text-gray-800',
     badge: 'bg-gray-500 text-white'
   }
 };
@@ -212,12 +200,12 @@ export default async function AdressesUtilesPage({ params: { lang } = { lang: 'f
                   
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
-                      {/* Icône avec fond coloré */}
+                      {/* Fond de l'icône - style Chambre Agriculture */}
                       <div className={`p-3 rounded-xl ${colors.bg}`}>
-                        <IconComponent className={`w-6 h-6 ${colors.text}`} />
+                        <IconComponent className={`w-6 h-6 ${colors.icon}`} />
                       </div>
                       
-                      {/* Badge avec la MÊME couleur que l'icône */}
+                      {/* Badge - MÊME famille de couleurs */}
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${colors.badge}`}>
                         {category.count || 0} {t('entities')}
                       </span>
