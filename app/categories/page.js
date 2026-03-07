@@ -1,9 +1,31 @@
-// app/categories/page.js
+// app/categories/page.js - VERSION NEC PLUS ULTRA
 import { createServerSupabaseClient } from '@/utils/supabase/server';
 import Link from 'next/link';
-import { Building2, ChevronRight } from 'lucide-react';
+import { 
+  Building2, 
+  ChevronRight,
+  Sprout,
+  FlaskConical,
+  Factory,
+  Utensils,
+  Cpu,
+  Zap,
+  Gem,
+  Hammer,
+  Package,
+  Ship,
+  ShoppingBag,
+  Leaf,
+  Paintbrush,
+  Truck,
+  Briefcase,
+  Globe,
+  Shield,
+  Plane,
+  Newspaper,
+  Fuel
+} from 'lucide-react';
 
-// Version simplifiée des traductions (pas de getTranslations)
 const translations = {
   fr: {
     categories: {
@@ -38,29 +60,29 @@ const translations = {
 };
 
 const categoryIcons = {
-  'AGRICULTURE': '🌾',
-  'AGROALIMENTAIRE': '🥫',
-  'AQUACULTURE, ELEVAGE & PECHE': '🐟',
-  'INDUSTRIE CHIMIQUE': '🧪',
-  'PLASTIQUES & CAOUTCHOUC': '🧴',
-  'SIDERURGIE & METALLURGIE': '⚙️',
-  'PAPIER & CARTONS': '📦',
-  'TRAVAIL DU BOIS & ARTICLES EN BOIS': '🪑',
-  'MACHINES & EQUIPEMENTS': '🔧',
-  'MACHINES & APPAREILS ELECTRIQUES': '⚡',
-  'MATERIELS DE TRANSPORT': '🚛',
-  'TRANSPORTS': '🚚',
-  'PRODUITS MINERAUX NON METALLIQUES': '🪨',
-  'TEXTILES, BONNETERIE & CONFECTION': '👕',
-  'ARTISANAT': '🪘',
-  'SERVICES': '💼',
-  'COMMERCE MULTIPLE': '🛍️',
-  'EDITION': '📰',
-  'ENERGIE & MINES': '⛽',
-  'AMBASSADES D\'ALGERIE A L\'ETRANGER': '🏛️',
-  'AMBASSADES EN ALGERIE': '🏛️',
-  'ASSURANCES': '🛡️',
-  'default': '🏢'
+  'AGRICULTURE': Sprout,
+  'AGROALIMENTAIRE': Utensils,
+  'AQUACULTURE, ELEVAGE & PECHE': Ship,
+  'INDUSTRIE CHIMIQUE': FlaskConical,
+  'PLASTIQUES & CAOUTCHOUC': Factory,
+  'SIDERURGIE & METALLURGIE': Hammer,
+  'PAPIER & CARTONS': Package,
+  'TRAVAIL DU BOIS & ARTICLES EN BOIS': Leaf,
+  'MACHINES & EQUIPEMENTS': Cpu,
+  'MACHINES & APPAREILS ELECTRIQUES': Zap,
+  'MATERIELS DE TRANSPORT': Truck,
+  'TRANSPORTS': Plane,
+  'PRODUITS MINERAUX NON METALLIQUES': Gem,
+  'TEXTILES, BONNETERIE & CONFECTION': ShoppingBag,
+  'ARTISANAT': Paintbrush,
+  'SERVICES': Briefcase,
+  'COMMERCE MULTIPLE': ShoppingBag,
+  'EDITION': Newspaper,
+  'ENERGIE & MINES': Fuel,
+  'AMBASSADES D\'ALGERIE A L\'ETRANGER': Globe,
+  'AMBASSADES EN ALGERIE': Globe,
+  'ASSURANCES': Shield,
+  'default': Building2
 };
 
 const categoryColors = {
@@ -137,7 +159,7 @@ export default async function CategoriesPage({ params: { lang } = { lang: 'fr' }
 
     return (
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-        {/* Hero Section - CHARTE GRAPHIQUE VERT/ROUGE */}
+        {/* Hero Section - IDENTIQUE À LA LANDING PAGE */}
         <div className="bg-white border-b border-gray-200 shadow-sm">
           <div className="container mx-auto px-4 py-12">
             <div className="max-w-4xl mx-auto text-center">
@@ -163,7 +185,7 @@ export default async function CategoriesPage({ params: { lang } = { lang: 'fr' }
         <div className="container mx-auto px-4 py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {stats.map((category) => {
-              const iconEmoji = categoryIcons[category.category] || categoryIcons.default;
+              const IconComponent = categoryIcons[category.category] || categoryIcons.default;
               const colorClass = categoryColors[category.category] || categoryColors.default;
               
               return (
@@ -172,13 +194,13 @@ export default async function CategoriesPage({ params: { lang } = { lang: 'fr' }
                   href={`/${lang}/exporters?category=${encodeURIComponent(category.category)}`}
                   className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100"
                 >
-                  {/* Bande décorative VERT/ROUGE */}
+                  {/* Bande décorative VERT/ROUGE - COMME SUR LA LANDING PAGE */}
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-red-500"></div>
                   
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
-                      <div className={`w-12 h-12 flex items-center justify-center text-2xl rounded-xl ${colorClass.split(' ')[0]}`}>
-                        {iconEmoji}
+                      <div className={`p-3 rounded-xl ${colorClass.split(' ')[0]}`}>
+                        <IconComponent className={`w-6 h-6 ${colorClass.split(' ')[1]}`} />
                       </div>
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${colorClass}`}>
                         {category.count || 0} {t('categories.entities')}
