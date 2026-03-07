@@ -1,181 +1,152 @@
-// app/categories/page.js
-import { createServerSupabaseClient } from '@/utils/supabase/server';
+// app/president-word/page.js
+import { Quote, Award, Heart } from 'lucide-react';
 import Link from 'next/link';
-import { Building2, ChevronRight } from 'lucide-react';
 
-const categoryIcons = {
-  'AGRICULTURE': '🌾',
-  'AGROALIMENTAIRE': '🥫',
-  'AQUACULTURE, ELEVAGE & PECHE': '🐟',
-  'INDUSTRIE CHIMIQUE': '🧪',
-  'PLASTIQUES & CAOUTCHOUC': '🧴',
-  'SIDERURGIE & METALLURGIE': '⚙️',
-  'PAPIER & CARTONS': '📦',
-  'TRAVAIL DU BOIS & ARTICLES EN BOIS': '🪑',
-  'MACHINES & EQUIPEMENTS': '🔧',
-  'MACHINES & APPAREILS ELECTRIQUES': '⚡',
-  'MATERIELS DE TRANSPORT': '🚛',
-  'TRANSPORTS': '🚚',
-  'PRODUITS MINERAUX NON METALLIQUES': '🪨',
-  'TEXTILES, BONNETERIE & CONFECTION': '👕',
-  'ARTISANAT': '🪘',
-  'SERVICES': '💼',
-  'COMMERCE MULTIPLE': '🛍️',
-  'EDITION': '📰',
-  'ENERGIE & MINES': '⛽',
-  'AMBASSADES D\'ALGERIE A L\'ETRANGER': '🏛️',
-  'AMBASSADES EN ALGERIE': '🏛️',
-  'ASSURANCES': '🛡️',
-  'default': '🏢'
-};
-
-const categoryColors = {
-  'AGRICULTURE': 'bg-green-100 text-green-800 border-green-200',
-  'INDUSTRIE CHIMIQUE': 'bg-purple-100 text-purple-800 border-purple-200',
-  'PLASTIQUES & CAOUTCHOUC': 'bg-blue-100 text-blue-800 border-blue-200',
-  'AGROALIMENTAIRE': 'bg-amber-100 text-amber-800 border-amber-200',
-  'MACHINES & EQUIPEMENTS': 'bg-indigo-100 text-indigo-800 border-indigo-200',
-  'MACHINES & APPAREILS ELECTRIQUES': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  'PRODUITS MINERAUX NON METALLIQUES': 'bg-gray-100 text-gray-800 border-gray-200',
-  'SIDERURGIE & METALLURGIE': 'bg-stone-100 text-stone-800 border-stone-200',
-  'PAPIER & CARTONS': 'bg-orange-100 text-orange-800 border-orange-200',
-  'AQUACULTURE, ELEVAGE & PECHE': 'bg-cyan-100 text-cyan-800 border-cyan-200',
-  'TEXTILES, BONNETERIE & CONFECTION': 'bg-pink-100 text-pink-800 border-pink-200',
-  'TRAVAIL DU BOIS & ARTICLES EN BOIS': 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  'ARTISANAT': 'bg-amber-100 text-amber-800 border-amber-200',
-  'MATERIELS DE TRANSPORT': 'bg-sky-100 text-sky-800 border-sky-200',
-  'SERVICES': 'bg-teal-100 text-teal-800 border-teal-200',
-  'ENERGIE & MINES': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  'EDITION': 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200',
-  'COMMERCE MULTIPLE': 'bg-rose-100 text-rose-800 border-rose-200',
-  'AMBASSADES D\'ALGERIE A L\'ETRANGER': 'bg-red-100 text-red-800 border-red-200',
-  'AMBASSADES EN ALGERIE': 'bg-red-100 text-red-800 border-red-200',
-  'ASSURANCES': 'bg-violet-100 text-violet-800 border-violet-200',
-  'TRANSPORTS': 'bg-sky-100 text-sky-800 border-sky-200',
-  'default': 'bg-gray-100 text-gray-800 border-gray-200'
-};
-
-export default async function CategoriesPage() {
-  try {
-    const supabase = await createServerSupabaseClient();
-    
-    if (!supabase || typeof supabase.from !== 'function') {
-      return (
-        <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-          <div className="container mx-auto px-4 py-12">
-            <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-6 max-w-3xl mx-auto">
-              <h2 className="text-red-800 font-semibold text-xl mb-2">Erreur de connexion</h2>
-              <p className="text-red-600">Impossible de se connecter à la base de données</p>
+export default function PresidentWordPage() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+      {/* Hero section avec portrait - CHARTE GRAPHIQUE */}
+      <div className="relative bg-gradient-to-r from-green-900 to-red-900 overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0 bg-[url('/algeria-map.png')] bg-center bg-no-repeat bg-contain"></div>
+        </div>
+        
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-green-50 to-transparent"></div>
+        
+        <div className="container mx-auto px-4 h-full flex items-end pb-20 relative z-10">
+          <div className="max-w-4xl">
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white rounded-full px-6 py-3 mb-8">
+              <Award className="w-5 h-5" />
+              <span>Message à la Nation • 2026</span>
             </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-4">
+              Mot du Président
+            </h1>
+            <p className="text-2xl text-green-100">
+              Son Excellence Monsieur Abdelmadjid Tebboune
+            </p>
+            <p className="text-xl text-white/80 mt-2">
+              Président de la République Algérienne Démocratique et Populaire
+            </p>
           </div>
         </div>
-      );
-    }
+      </div>
 
-    const { data: stats, error } = await supabase
-      .from('category_stats')
-      .select('*');
-
-    if (error || !stats) {
-      return (
-        <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-          <div className="container mx-auto px-4 py-12">
-            <div className="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-6 max-w-3xl mx-auto">
-              <h2 className="text-yellow-800 font-semibold text-xl mb-2">Aucune catégorie trouvée</h2>
-              <p className="text-yellow-600">Les données ne sont pas encore disponibles</p>
-            </div>
+      {/* Contenu du message */}
+      <div className="container mx-auto px-4 py-20">
+        <div className="max-w-4xl mx-auto">
+          {/* Citation d'ouverture */}
+          <div className="mb-16 relative">
+            <Quote className="absolute -top-6 -left-6 w-16 h-16 text-green-200" />
+            <p className="text-3xl font-light text-gray-700 leading-relaxed pl-12">
+              "L'Algérie nouvelle que nous construisons ensemble ne se contente pas 
+              de regarder vers l'avenir - elle l'invente, le façonne et le partage 
+              avec ses frères du continent."
+            </p>
           </div>
-        </div>
-      );
-    }
 
-    const totalEntries = stats.reduce((sum, cat) => sum + (cat.count || 0), 0);
+          {/* Message principal */}
+          <div className="prose prose-lg max-w-none space-y-8">
+            <p className="text-xl text-gray-600 leading-relaxed">
+              Mesdames, Messieurs, chers opérateurs économiques,
+            </p>
+            
+            <p className="text-gray-700 leading-relaxed">
+              C'est avec une fierté légitime que je salue aujourd'hui la naissance 
+              d'ALGERIA EXPORT, cette plateforme qui incarne la vision que je porte 
+              pour notre pays : une Algérie digitale, ouverte sur le monde, et résolument 
+              tournée vers son destin africain.
+            </p>
+            
+            <p className="text-gray-700 leading-relaxed">
+              Notre pays a toujours été un carrefour, un pont entre les rives de la 
+              Méditerranée et les profondeurs de l'Afrique. Aujourd'hui, nous faisons 
+              franchir à cette vocation historique un cap décisif : celui du numérique.
+            </p>
 
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-        <div className="bg-white border-b border-gray-200 shadow-sm">
-          <div className="container mx-auto px-4 py-12">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <div className="bg-green-50 border-l-4 border-green-500 p-8 my-12 rounded-r-xl">
+              <h2 className="text-2xl font-bold text-green-800 mb-4">
                 <span className="bg-gradient-to-r from-green-600 to-red-600 text-transparent bg-clip-text">
-                  Catégories d'Exportateurs
+                  Le commerce Sud-Sud : notre priorité stratégique
                 </span>
-              </h1>
-              <p className="text-xl text-gray-600 mb-4">
-                Explorez notre annuaire par secteur d'activité
+              </h2>
+              <p className="text-green-700">
+                J'ai personnellement insisté pour que cette plateforme offre une place 
+                privilégiée à nos frères africains. L'Afrique doit commercer avec 
+                l'Afrique. Nos richesses complémentaires, notre jeunesse dynamique, 
+                notre soif commune de prospérité sont les atouts d'une renaissance 
+                économique dont l'Algérie sera le moteur.
               </p>
-              <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-6 py-3">
-                <Building2 className="w-5 h-5 text-gray-600" />
-                <span className="text-gray-800 font-medium">
-                  {totalEntries} entreprises référencées
-                </span>
+            </div>
+
+            <p className="text-gray-700 leading-relaxed">
+              Aux exportateurs algériens, je dis : votre pays est fier de vous. 
+              Vous portez haut les couleurs de notre nation. Cette plateforme est 
+              votre vitrine vers le monde.
+            </p>
+            
+            <p className="text-gray-700 leading-relaxed">
+              À nos partenaires africains, je lance un appel fraternel : l'Algérie 
+              vous ouvre ses portes grandes. Venez présenter vos produits, venez 
+              conquérir nos marchés, venez construire avec nous l'Afrique prospère 
+              et unie de demain.
+            </p>
+
+            {/* Signature */}
+            <div className="mt-20 pt-10 border-t">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-gray-800">
+                    Abdelmadjid Tebboune
+                  </p>
+                  <p className="text-gray-500">
+                    Président de la République Algérienne Démocratique et Populaire
+                  </p>
+                  <p className="text-gray-400 mt-2">
+                    Alger, le 1er mars 2026
+                  </p>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-2 text-red-600">
+                    <Heart className="w-5 h-5 fill-current" />
+                    <span className="font-medium">Pour l'Algérie et l'Afrique</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="container mx-auto px-4 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {stats.map((category) => {
-              const iconEmoji = categoryIcons[category.category] || categoryIcons.default;
-              const colorClass = categoryColors[category.category] || categoryColors.default;
-              
-              return (
-                <Link
-                  key={category.category}
-                  href={`/exporters?category=${encodeURIComponent(category.category)}`}
-                  className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100"
-                >
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-red-500"></div>
-                  
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`w-12 h-12 flex items-center justify-center text-2xl rounded-xl ${colorClass.split(' ')[0]}`}>
-                        {iconEmoji}
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${colorClass}`}>
-                        {category.count || 0} entités
-                      </span>
-                    </div>
-                    
-                    <h2 className="text-xl font-semibold text-gray-800 mb-2 group-hover:text-green-600 transition-colors">
-                      {category.category}
-                    </h2>
-                    
-                    <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                      <div 
-                        className="bg-gradient-to-r from-green-500 to-red-500 h-2 rounded-full transition-all duration-500"
-                        style={{ 
-                          width: `${Math.min(100, ((category.count || 0) / Math.max(...stats.map(c => c.count))) * 100)}%` 
-                        }}
-                      ></div>
-                    </div>
-                    
-                    <div className="flex items-center text-sm text-gray-500">
-                      <span className="flex-1">
-                        {Math.round((category.count / totalEntries) * 100)}% du total
-                      </span>
-                      <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-green-500 group-hover:translate-x-1 transition-all" />
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+          {/* Chiffres clés - CARTES CHARTE GRAPHIQUE */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20">
+            <div className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 p-6 text-center">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-red-500"></div>
+              <div className="text-4xl font-bold text-green-600 mb-2">54</div>
+              <div className="text-gray-600">Pays africains invités</div>
+            </div>
+            <div className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 p-6 text-center">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-red-500"></div>
+              <div className="text-4xl font-bold text-green-600 mb-2">1200+</div>
+              <div className="text-gray-600">Exportateurs algériens</div>
+            </div>
+            <div className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 p-6 text-center">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-red-500"></div>
+              <div className="text-4xl font-bold text-green-600 mb-2">2026</div>
+              <div className="text-gray-600">Année du commerce Sud-Sud</div>
+            </div>
+          </div>
+
+          {/* Bouton de retour */}
+          <div className="text-center mt-12">
+            <Link 
+              href="/"
+              className="inline-block bg-gradient-to-r from-green-600 to-red-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:scale-105"
+            >
+              Retour à l'accueil
+            </Link>
           </div>
         </div>
       </div>
-    );
-
-  } catch (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-        <div className="container mx-auto px-4 py-12">
-          <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-6 max-w-3xl mx-auto">
-            <h2 className="text-red-800 font-semibold text-xl mb-2">Erreur inattendue</h2>
-            <p className="text-red-600 mb-2">Une erreur est survenue</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    </div>
+  );
 }
