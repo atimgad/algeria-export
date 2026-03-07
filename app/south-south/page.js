@@ -8,7 +8,8 @@ import {
   ArrowRight,
   MapPin,
   Briefcase,
-  ChevronRight
+  ChevronRight,
+  Building2
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -33,7 +34,7 @@ export default async function SouthSouthPage() {
               </div>
               
               <h1 className="text-5xl md:text-6xl font-bold mb-6">
-                <span className="block">L'Afrique se lève,</span>
+                <span className="block text-white">L'Afrique se lève,</span>
                 <span className="bg-gradient-to-r from-yellow-300 to-yellow-500 text-transparent bg-clip-text">
                   l'Afrique commerce
                 </span>
@@ -65,7 +66,7 @@ export default async function SouthSouthPage() {
             </p>
             <Link 
               href="/categories"
-              className="inline-block mt-6 bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-medium transition"
+              className="inline-block mt-6 bg-gradient-to-r from-green-600 to-red-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:scale-105"
             >
               Voir les catégories
             </Link>
@@ -89,7 +90,7 @@ export default async function SouthSouthPage() {
 
     return (
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-        {/* Hero Section Spéciale Sud-Sud */}
+        {/* Hero Section Spéciale Sud-Sud - CHARTE GRAPHIQUE */}
         <div className="relative bg-gradient-to-r from-green-900 to-red-900 text-white overflow-hidden">
           <div className="absolute inset-0 bg-black/20"></div>
           <div className="absolute inset-0 opacity-10">
@@ -106,7 +107,7 @@ export default async function SouthSouthPage() {
               </div>
               
               <h1 className="text-5xl md:text-6xl font-bold mb-6">
-                <span className="block">L'Afrique se lève,</span>
+                <span className="block text-white">L'Afrique se lève,</span>
                 <span className="bg-gradient-to-r from-yellow-300 to-yellow-500 text-transparent bg-clip-text">
                   l'Afrique commerce
                 </span>
@@ -125,7 +126,7 @@ export default async function SouthSouthPage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link 
                   href="/african-exporters/join"
-                  className="bg-yellow-500 hover:bg-yellow-400 text-green-900 font-bold px-8 py-4 rounded-xl text-lg transition-all transform hover:scale-105 shadow-xl flex items-center justify-center gap-2"
+                  className="bg-gradient-to-r from-green-600 to-red-600 text-white font-bold px-8 py-4 rounded-xl text-lg hover:shadow-xl transition transform hover:scale-105 flex items-center justify-center gap-2"
                 >
                   <Users className="w-5 h-5" />
                   Exposant Africain ? Rejoignez-nous
@@ -134,7 +135,7 @@ export default async function SouthSouthPage() {
                 
                 <Link 
                   href="/partenaires-africains"
-                  className="bg-white/20 hover:bg-white/30 text-white font-bold px-8 py-4 rounded-xl text-lg backdrop-blur-sm transition-all flex items-center justify-center gap-2 border border-white/30"
+                  className="bg-white border-2 border-green-600 text-green-700 font-bold px-8 py-4 rounded-xl text-lg hover:bg-green-50 transition flex items-center justify-center gap-2"
                 >
                   <Handshake className="w-5 h-5" />
                   Trouver des partenaires africains
@@ -154,17 +155,19 @@ export default async function SouthSouthPage() {
               <div className="relative z-10">
                 <div className="flex items-center gap-4 mb-8">
                   <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center">
-                    <Globe2 className="w-8 h-8 text-green-600" />
+                    <Globe2 className="w-8 h-8 text-green-800" />
                   </div>
                   <h2 className="text-3xl font-bold text-gray-800">
-                    À nos frères du continent : <span className="text-green-600">L'Algérie vous ouvre ses portes</span>
+                    <span className="bg-gradient-to-r from-green-600 to-red-600 text-transparent bg-clip-text">
+                      À nos frères du continent
+                    </span>
                   </h2>
                 </div>
                 
                 <div className="grid md:grid-cols-3 gap-8 mb-12">
                   <div className="bg-green-50 rounded-xl p-6">
-                    <div className="w-12 h-12 bg-green-200 rounded-lg flex items-center justify-center mb-4">
-                      <MapPin className="w-6 h-6 text-green-700" />
+                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                      <MapPin className="w-6 h-6 text-green-800" />
                     </div>
                     <h3 className="font-bold text-lg mb-2">54 Pays invités</h3>
                     <p className="text-gray-600">
@@ -174,8 +177,8 @@ export default async function SouthSouthPage() {
                   </div>
                   
                   <div className="bg-green-50 rounded-xl p-6">
-                    <div className="w-12 h-12 bg-green-200 rounded-lg flex items-center justify-center mb-4">
-                      <Briefcase className="w-6 h-6 text-green-700" />
+                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                      <Briefcase className="w-6 h-6 text-green-800" />
                     </div>
                     <h3 className="font-bold text-lg mb-2">Exposition gratuite</h3>
                     <p className="text-gray-600">
@@ -185,8 +188,8 @@ export default async function SouthSouthPage() {
                   </div>
                   
                   <div className="bg-green-50 rounded-xl p-6">
-                    <div className="w-12 h-12 bg-green-200 rounded-lg flex items-center justify-center mb-4">
-                      <Handshake className="w-6 h-6 text-green-700" />
+                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                      <Handshake className="w-6 h-6 text-green-800" />
                     </div>
                     <h3 className="font-bold text-lg mb-2">Mise en relation directe</h3>
                     <p className="text-gray-600">
@@ -207,7 +210,7 @@ export default async function SouthSouthPage() {
               </div>
             </div>
 
-            {/* Section des exposants (affichée seulement si des données existent) */}
+            {/* Section des exposants */}
             {featuredExporters && featuredExporters.length > 0 && (
               <>
                 <h2 className="text-3xl font-bold text-center mb-12">
@@ -218,21 +221,29 @@ export default async function SouthSouthPage() {
                 
                 <div className="grid md:grid-cols-3 gap-6">
                   {featuredExporters.slice(0, 3).map((exporter, index) => (
-                    <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
+                    <div key={index} className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-red-500"></div>
                       <div className="h-48 bg-gradient-to-br from-green-100 to-red-100 relative">
-                        <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-full text-sm font-semibold text-green-700">
+                        <div className="absolute top-4 right-4 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
                           Nouveau
                         </div>
                       </div>
                       <div className="p-6">
                         <div className="flex items-center gap-2 mb-3">
-                          <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                          <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
                             {exporter.category || 'Afrique'}
                           </span>
                         </div>
-                        <h3 className="font-bold text-xl mb-2">{exporter.name || 'Exportateur africain'}</h3>
-                        <p className="text-gray-600 mb-4">Produits de qualité disponibles à l'export</p>
-                        <Link href={`/exporters/${exporter.id}`} className="text-green-600 font-medium flex items-center gap-1 hover:gap-2 transition-all">
+                        <h3 className="font-bold text-xl mb-2 text-gray-800 group-hover:text-green-600 transition-colors">
+                          {exporter.name || 'Exportateur africain'}
+                        </h3>
+                        <p className="text-gray-600 mb-4 line-clamp-2">
+                          Produits de qualité disponibles à l'export
+                        </p>
+                        <Link 
+                          href={`/exporters/${exporter.id}`} 
+                          className="text-green-600 font-medium flex items-center gap-1 hover:gap-2 transition-all"
+                        >
                           Voir le catalogue <ChevronRight className="w-4 h-4" />
                         </Link>
                       </div>
@@ -252,7 +263,7 @@ export default async function SouthSouthPage() {
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
         <div className="container mx-auto px-4 py-12">
           <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-6 max-w-3xl mx-auto">
-            <h2 className="text-red-800 font-semibold text-xl mb-2">Erreur de chargement</h2>
+            <h2 className="text-red-800 font-semibold text-xl mb-2">Erreur inattendue</h2>
             <p className="text-red-600">Une erreur est survenue. Veuillez réessayer plus tard.</p>
           </div>
         </div>
