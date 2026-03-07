@@ -180,7 +180,7 @@ export default async function CategoriesPage({ params: { lang } = { lang: 'fr' }
               return (
                 <Link
                   key={category.category}
-                  href={`/${lang}/exporters?category=${encodeURIComponent(category.category)}`}
+                  href={`/${lang}/exporters/category/${encodeURIComponent(category.category)}`}
                   className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100"
                 >
                   {/* Bande décorative VERT/ROUGE */}
