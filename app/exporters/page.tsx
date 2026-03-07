@@ -3,6 +3,21 @@ import { createServerSupabaseClient } from '@/utils/supabase/server';
 import Link from 'next/link';
 import { Building2, Filter, Search, ChevronRight } from 'lucide-react';
 
+// Catégories à exclure (adresses utiles)
+const excludedCategories = [
+  'BANQUES',
+  'CHAMBRES D\'AGRICULTURE',
+  'CHAMBRES D\'ARTISANAT',
+  'CHAMBRES DE COMMERCE ET D\'INDUSTRIE',
+  'CHAMBRES DE LA PÊCHE',
+  'DIRECTIONS DE COMMERCE',
+  'ENTREPRISES PORTUAIRES',
+  'ORGANISMES OFFICIELS',
+  'AMBASSADES D\'ALGERIE A L\'ETRANGER',
+  'AMBASSADES EN ALGERIE',
+  'ASSURANCES'
+];
+
 export default async function ExportersPage({ searchParams }: { searchParams: { category?: string } }) {
   const supabase = await createServerSupabaseClient();
   
@@ -22,7 +37,8 @@ export default async function ExportersPage({ searchParams }: { searchParams: { 
   
   let query = supabase
     .from('official_directory')
-    .select('*');
+    .select('*')
+    .not('category', 'in', `(${excludedCategories.map(c => `'${c}'`).join(',')})`);
   
   if (searchParams.category) {
     query = query.eq('category', searchParams.category);
