@@ -74,14 +74,16 @@ const categoryIcons = {
   'ENTREPRISES PORTUAIRES': Ship,
   'ORGANISMES OFFICIELS': Globe,
   'GROUPES INDUSTRIELS': Factory,
+  'AGENCES DE VOYAGES': Plane,
   'default': Building2
 };
 
-// COULEUR UNIQUE POUR TOUTES LES CATÉGORIES (modèle Chambre Agriculture)
+// STYLE UNIQUE POUR TOUTES LES CATÉGORIES
 const categoryStyle = {
-  bg: 'bg-green-100',
-  icon: 'text-green-800',
-  badge: 'bg-green-500 text-white'
+  iconBg: 'bg-green-100',
+  iconColor: 'text-green-800',
+  badgeBg: 'bg-green-500',
+  badgeText: 'text-white'
 };
 
 export default async function CategoriesPage({ params: { lang } = { lang: 'fr' } }) {
@@ -165,13 +167,13 @@ export default async function CategoriesPage({ params: { lang } = { lang: 'fr' }
                   
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
-                      {/* Icône avec fond vert (modèle Chambre Agriculture) */}
-                      <div className={`p-3 rounded-xl ${categoryStyle.bg}`}>
-                        <IconComponent className={`w-6 h-6 ${categoryStyle.icon}`} />
+                      {/* Icône avec fond vert */}
+                      <div className={`p-3 rounded-xl ${categoryStyle.iconBg}`}>
+                        <IconComponent className={`w-6 h-6 ${categoryStyle.iconColor}`} />
                       </div>
                       
-                      {/* Badge vert (modèle Chambre Agriculture) */}
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${categoryStyle.badge}`}>
+                      {/* Badge VERT FONCÉ (bg-green-500) comme demandé */}
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${categoryStyle.badgeBg} ${categoryStyle.badgeText}`}>
                         {category.count || 0} {t('entities')}
                       </span>
                     </div>
