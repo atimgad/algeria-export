@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { 
   Building2, 
-  Search, 
   ChevronLeft, 
   ChevronRight,
   Filter,
@@ -23,8 +22,7 @@ export default async function CategoryExportersPage({
     nom?: string,
     ville?: string,
     wilaya?: string,
-    produit?: string,
-    dirigeant?: string
+    produit?: string
   }
 }) {
   const supabase = await createServerSupabaseClient();
@@ -40,33 +38,39 @@ export default async function CategoryExportersPage({
     );
   }
 
-  const category = decodeURIComponent(params.category);
+  // Récupération sécurisée du paramètre category
+  let category = '';
+  if (params && params.category) {
+    category = decodeURIComponent(params.category);
+  }
+
   const currentPage = parseInt(searchParams.page || '1');
   const itemsPerPage = 20;
 
-  // Construction des filtres
+  // Construction de la requête de base
   let query = supabase
     .from('official_directory')
     .select('*', { count: 'exact' })
-    .eq('category', category)
     .eq('entity_type', 'company');
 
-  // Filtre par nom
+  // Ajout du filtre par catégorie si elle existe
+  if (category) {
+    query = query.eq('category', category);
+  }
+
+  // Filtres optionnels
   if (searchParams.nom) {
     query = query.ilike('name', `%${searchParams.nom}%`);
   }
 
-  // Filtre par ville (dans l'adresse)
   if (searchParams.ville) {
     query = query.ilike('address', `%${searchParams.ville}%`);
   }
 
-  // Filtre par wilaya (dans l'adresse)
   if (searchParams.wilaya) {
     query = query.ilike('address', `%${searchParams.wilaya}%`);
   }
 
-  // Filtre par produit
   if (searchParams.produit) {
     query = query.contains('products', [searchParams.produit]);
   }
@@ -78,7 +82,7 @@ export default async function CategoryExportersPage({
   const { data: exporters, count, error } = await query
     .range(from, to);
 
-  if (error || !exporters) {
+  if (error) {
     console.error('Erreur:', error);
     notFound();
   }
@@ -118,10 +122,10 @@ export default async function CategoryExportersPage({
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              {category}
+              {category || 'Toutes les catégories'}
             </h1>
             <p className="text-xl text-green-100">
-              {count} entreprises référencées dans cette catégorie
+              {count || 0} entreprises référencées
             </p>
           </div>
         </div>
@@ -200,12 +204,14 @@ export default async function CategoryExportersPage({
                 Rechercher
               </button>
               
-              <Link
-                href={`/exporters/category/${encodeURIComponent(category)}`}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
-              >
-                Réinitialiser
-              </Link>
+              {category && (
+                <Link
+                  href={`/exporters/category/${encodeURIComponent(category)}`}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
+                >
+                  Réinitialiser
+                </Link>
+              )}
             </div>
           </div>
         </form>
@@ -213,7 +219,7 @@ export default async function CategoryExportersPage({
 
       {/* Liste des entreprises */}
       <div className="container mx-auto px-4 py-8">
-        {exporters.length === 0 ? (
+        {!exporters || exporters.length === 0 ? (
           <div className="text-center py-20">
             <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
