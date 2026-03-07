@@ -1,165 +1,183 @@
-import { createClient } from '@/lib/supabase-server';
+// app/exporters/[id]/page.tsx
+import { createServerSupabaseClient } from '@/utils/supabase/server';
 import { notFound } from 'next/navigation';
-import { Building2, Phone, Mail, Globe, Package, MapPin, Printer, Calendar, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { 
+  Building2, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Globe, 
+  ChevronLeft,
+  Package,
+  Shield,
+  Star
+} from 'lucide-react';
 
-export default async function ExporterDetailPage(props: { 
-  params: Promise<{ id: string }>
-}) {
-  const params = await props.params;
-  const supabase = await createClient();
+export default async function ExporterDetailPage({ params }: { params: { id: string } }) {
+  const supabase = await createServerSupabaseClient();
   
-  const { data: exporter } = await supabase
-    .from('exporters')
+  const { data: exporter, error } = await supabase
+    .from('official_directory')
     .select('*')
     .eq('id', params.id)
     .single();
 
-  if (!exporter) {
+  if (error || !exporter) {
     notFound();
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <Link href="/" className="text-2xl font-bold">
-              <span className="text-[#003153]">Algeria<span className="text-[#2E7D32]">Export</span></span>
-            </Link>
-            <nav className="flex items-center gap-6">
-              <Link href="/" className="text-gray-600 hover:text-[#003153]">Accueil</Link>
-              <Link href="/exporters" className="text-[#003153] font-medium">Exportateurs</Link>
-              <Link href="/stats" className="text-gray-600 hover:text-[#003153]">Statistiques</Link>
-            </nav>
-          </div>
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+      {/* Header avec retour */}
+      <div className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="container mx-auto px-4 py-6">
+          <Link 
+            href="/exporters" 
+            className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 transition"
+          >
+            <ChevronLeft className="w-5 h-5" />
+            Retour aux exportateurs
+          </Link>
         </div>
-      </header>
+      </div>
 
-      <main className="container mx-auto px-4 py-8">
-        {/* Bouton retour */}
-        <Link href="/exporters" className="inline-flex items-center gap-2 text-gray-600 hover:text-[#003153] mb-6">
-          <ArrowLeft className="h-4 w-4" />
-          Retour à la liste
-        </Link>
-
-        {/* En-tête entreprise */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 bg-gradient-to-br from-[#003153] to-[#2E7D32] rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-                {exporter.name?.charAt(0) || 'E'}
+      {/* Contenu principal */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-4xl mx-auto">
+          {/* En-tête avec titre */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-green-100 rounded-xl">
+                <Building2 className="w-8 h-8 text-green-800" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-[#003153] mb-2">{exporter.name}</h1>
-                <div className="flex items-center gap-3">
-                  <span className="px-3 py-1 bg-[#003153]/10 text-[#003153] rounded-full text-sm font-medium">
-                    {exporter.company_type?.toUpperCase() || 'ENTREPRISE'}
+                <h1 className="text-4xl font-bold mb-2">
+                  <span className="bg-gradient-to-r from-green-600 to-red-600 text-transparent bg-clip-text">
+                    {exporter.name}
                   </span>
-                  {exporter.activity_sector && (
-                    <span className="px-3 py-1 bg-[#2E7D32]/10 text-[#2E7D32] rounded-full text-sm">
-                      {exporter.activity_sector}
+                </h1>
+                <div className="flex items-center gap-3">
+                  <span className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    {exporter.category || 'Non catégorisé'}
+                  </span>
+                  {exporter.trust_level === 'verified' && (
+                    <span className="flex items-center gap-1 text-green-600 text-sm">
+                      <Shield className="w-4 h-4" />
+                      Vérifié
                     </span>
                   )}
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Grille d'informations */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Colonne principale */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Produits */}
-            {exporter.products && exporter.products.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <h2 className="text-xl font-bold text-[#003153] mb-4 flex items-center gap-2">
-                  <Package className="h-5 w-5" />
-                  Produits exportés
-                </h2>
-                <div className="flex flex-wrap gap-2">
-                  {exporter.products.map((product: string, index: number) => (
-                    <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                      {product}
-                    </span>
-                  ))}
+          {/* Grille d'informations */}
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            {/* Contact */}
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 col-span-2">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-red-600 rounded-lg flex items-center justify-center text-white text-sm font-bold">
+                  <Phone className="w-4 h-4" />
                 </div>
-              </div>
-            )}
-
-            {/* Adresse */}
-            {exporter.address && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <h2 className="text-xl font-bold text-[#003153] mb-4 flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  Adresse
-                </h2>
-                <p className="text-gray-600">{exporter.address}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Colonne latérale - Contacts */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h2 className="text-xl font-bold text-[#003153] mb-4">Contacts</h2>
+                Informations de contact
+              </h2>
+              
               <div className="space-y-4">
-                {exporter.phone && (
-                  <a href={`tel:${exporter.phone}`} className="flex items-center gap-3 text-gray-600 hover:text-[#2E7D32] group">
-                    <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-[#2E7D32]/10">
-                      <Phone className="h-5 w-5" />
-                    </div>
-                    <span>{exporter.phone}</span>
-                  </a>
-                )}
-                
-                {exporter.fax && (
-                  <div className="flex items-center gap-3 text-gray-600">
-                    <div className="p-2 bg-gray-100 rounded-lg">
-                      <Printer className="h-5 w-5" />
-                    </div>
-                    <span>{exporter.fax}</span>
+                {exporter.address && (
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                    <p className="text-gray-700">{exporter.address}</p>
                   </div>
                 )}
                 
-                {exporter.email && (
-                  <a href={`mailto:${exporter.email}`} className="flex items-center gap-3 text-gray-600 hover:text-[#2E7D32] group">
-                    <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-[#2E7D32]/10">
-                      <Mail className="h-5 w-5" />
-                    </div>
-                    <span className="truncate">{exporter.email}</span>
-                  </a>
+                {exporter.phone && exporter.phone[0] && (
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                    <a href={`tel:${exporter.phone[0]}`} className="text-green-600 hover:underline">
+                      {exporter.phone[0]}
+                    </a>
+                  </div>
                 )}
                 
-                {exporter.website && (
-                  <a href={exporter.website.startsWith('http') ? exporter.website : `https://${exporter.website}`} 
-                     target="_blank" 
-                     rel="noopener noreferrer"
-                     className="flex items-center gap-3 text-gray-600 hover:text-[#2E7D32] group">
-                    <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-[#2E7D32]/10">
-                      <Globe className="h-5 w-5" />
-                    </div>
-                    <span className="truncate">{exporter.website}</span>
-                  </a>
+                {exporter.email && exporter.email[0] && (
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                    <a href={`mailto:${exporter.email[0]}`} className="text-green-600 hover:underline">
+                      {exporter.email[0]}
+                    </a>
+                  </div>
                 )}
-
-                {exporter.created_at && (
-                  <div className="flex items-center gap-3 text-gray-600 pt-4 border-t border-gray-100">
-                    <div className="p-2 bg-gray-100 rounded-lg">
-                      <Calendar className="h-5 w-5" />
-                    </div>
-                    <span className="text-sm">
-                      Inscrit le {new Date(exporter.created_at).toLocaleDateString('fr-FR')}
-                    </span>
+                
+                {exporter.website && exporter.website[0] && (
+                  <div className="flex items-center gap-3">
+                    <Globe className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                    <a 
+                      href={exporter.website[0].startsWith('http') ? exporter.website[0] : `https://${exporter.website[0]}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-green-600 hover:underline"
+                    >
+                      Site web
+                    </a>
                   </div>
                 )}
               </div>
             </div>
+
+            {/* Score de confiance */}
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-red-600 rounded-lg flex items-center justify-center text-white text-sm font-bold">
+                  <Star className="w-4 h-4" />
+                </div>
+                Score de confiance
+              </h2>
+              
+              <div className="text-center">
+                <div className="text-5xl font-bold text-green-600 mb-2">
+                  {exporter.trust_score || 100}
+                </div>
+                <p className="text-sm text-gray-500 mb-4">/100</p>
+                
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                  <div 
+                    className="bg-gradient-to-r from-green-500 to-red-500 h-2 rounded-full"
+                    style={{ width: `${exporter.trust_score || 100}%` }}
+                  ></div>
+                </div>
+                
+                <p className="text-sm text-gray-600">
+                  {exporter.trust_details || 'Entreprise vérifiée et certifiée'}
+                </p>
+              </div>
+            </div>
           </div>
+
+          {/* Produits */}
+          {exporter.products && exporter.products.length > 0 && (
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-red-600 rounded-lg flex items-center justify-center text-white text-sm font-bold">
+                  <Package className="w-4 h-4" />
+                </div>
+                Produits et services
+              </h2>
+              
+              <div className="flex flex-wrap gap-2">
+                {exporter.products.map((product: string, index: number) => (
+                  <span 
+                    key={index}
+                    className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium"
+                  >
+                    {product}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      </main>
+      </div>
     </div>
   );
 }
