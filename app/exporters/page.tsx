@@ -1,7 +1,23 @@
 // app/exporters/page.tsx
 import { createServerSupabaseClient } from '@/utils/supabase/server';
 import Link from 'next/link';
-import { Building2, Filter, Search, ChevronRight, Shield, Star } from 'lucide-react';
+import { Building2, Filter, Search, ChevronRight, Shield } from 'lucide-react';
+
+// Liste stricte des catégories à exclure (adresses utiles)
+const EXCLUDED_CATEGORIES = [
+  'AMBASSADES D\'ALGERIE A L\'ETRANGER',
+  'AMBASSADES EN ALGERIE',
+  'BANQUES',
+  'CHAMBRES D\'AGRICULTURE',
+  'CHAMBRES D\'ARTISANAT',
+  'CHAMBRES DE COMMERCE ET D\'INDUSTRIE',
+  'CHAMBRES DE LA PÊCHE',
+  'DIRECTIONS DE COMMERCE',
+  'ENTREPRISES PORTUAIRES',
+  'ORGANISMES OFFICIELS',
+  'ASSURANCES',
+  'HÔTELS' // À ajouter quand la catégorie existera
+];
 
 export default async function ExportersPage({ searchParams }: { searchParams: { 
   category?: string,
@@ -21,10 +37,11 @@ export default async function ExportersPage({ searchParams }: { searchParams: {
     );
   }
   
-  // Construction de la requête
+  // Construction de la requête avec exclusion des adresses utiles
   let query = supabase
     .from('official_directory')
-    .select('*');
+    .select('*')
+    .not('category', 'in', `(${EXCLUDED_CATEGORIES.map(c => `'${c.replace(/'/g, "''")}'`).join(',')})`);
   
   if (searchParams.category) {
     query = query.eq('category', searchParams.category);
@@ -54,18 +71,18 @@ export default async function ExportersPage({ searchParams }: { searchParams: {
               </span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Annuaire des exportateurs potentiels et certifiés
+              Entreprises commerciales et industrielles
             </p>
             
             {/* Statistiques */}
             <div className="flex flex-wrap justify-center gap-4 mb-12">
               <div className="bg-green-100 text-green-800 px-6 py-3 rounded-full text-sm font-medium flex items-center gap-2">
                 <Building2 className="w-4 h-4" />
-                {exporters?.length || 0} au total
+                {exporters?.length || 0} entreprises
               </div>
               <div className="bg-green-500 text-white px-6 py-3 rounded-full text-sm font-medium flex items-center gap-2">
                 <Shield className="w-4 h-4" />
-                {exporters?.filter(e => e.is_exporter).length || 0} certifiés
+                {exporters?.filter(e => e.is_exporter).length || 0} certifiées
               </div>
             </div>
 
@@ -98,7 +115,7 @@ export default async function ExportersPage({ searchParams }: { searchParams: {
               <Building2 className="w-12 h-12 text-green-600" />
             </div>
             <h2 className="text-3xl font-bold text-gray-800 mb-3">
-              Aucun exportateur trouvé
+              Aucune entreprise trouvée
             </h2>
             <p className="text-lg text-gray-600 max-w-md mx-auto">
               Essayez de modifier vos filtres de recherche
