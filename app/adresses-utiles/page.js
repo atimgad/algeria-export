@@ -44,12 +44,13 @@ const categoryIcons = {
   'default': Building2
 };
 
-// Palette unique par catégorie (inspirée de Chambre d'Agriculture)
+// UNE SEULE COULEUR POUR TOUTES LES CATÉGORIES
 const categoryColors = {
+  // Toutes les catégories utilisent le même vert
   'BANQUES': {
-    bg: 'bg-emerald-100',
-    icon: 'text-emerald-800',
-    badge: 'bg-emerald-500 text-white'
+    bg: 'bg-green-100',
+    icon: 'text-green-800',
+    badge: 'bg-green-500 text-white'
   },
   'CHAMBRES D\'AGRICULTURE': {
     bg: 'bg-green-100',
@@ -57,54 +58,54 @@ const categoryColors = {
     badge: 'bg-green-500 text-white'
   },
   'CHAMBRES D\'ARTISANAT': {
-    bg: 'bg-amber-100',
-    icon: 'text-amber-800',
-    badge: 'bg-amber-500 text-white'
+    bg: 'bg-green-100',
+    icon: 'text-green-800',
+    badge: 'bg-green-500 text-white'
   },
   'CHAMBRES DE COMMERCE ET D\'INDUSTRIE': {
-    bg: 'bg-blue-100',
-    icon: 'text-blue-800',
-    badge: 'bg-blue-500 text-white'
+    bg: 'bg-green-100',
+    icon: 'text-green-800',
+    badge: 'bg-green-500 text-white'
   },
   'CHAMBRES DE LA PÊCHE': {
-    bg: 'bg-cyan-100',
-    icon: 'text-cyan-800',
-    badge: 'bg-cyan-500 text-white'
+    bg: 'bg-green-100',
+    icon: 'text-green-800',
+    badge: 'bg-green-500 text-white'
   },
   'DIRECTIONS DE COMMERCE': {
-    bg: 'bg-purple-100',
-    icon: 'text-purple-800',
-    badge: 'bg-purple-500 text-white'
+    bg: 'bg-green-100',
+    icon: 'text-green-800',
+    badge: 'bg-green-500 text-white'
   },
   'ENTREPRISES PORTUAIRES': {
-    bg: 'bg-sky-100',
-    icon: 'text-sky-800',
-    badge: 'bg-sky-500 text-white'
+    bg: 'bg-green-100',
+    icon: 'text-green-800',
+    badge: 'bg-green-500 text-white'
   },
   'ORGANISMES OFFICIELS': {
-    bg: 'bg-indigo-100',
-    icon: 'text-indigo-800',
-    badge: 'bg-indigo-500 text-white'
+    bg: 'bg-green-100',
+    icon: 'text-green-800',
+    badge: 'bg-green-500 text-white'
   },
   'AMBASSADES D\'ALGERIE A L\'ETRANGER': {
-    bg: 'bg-red-100',
-    icon: 'text-red-800',
-    badge: 'bg-red-500 text-white'
+    bg: 'bg-green-100',
+    icon: 'text-green-800',
+    badge: 'bg-green-500 text-white'
   },
   'AMBASSADES EN ALGERIE': {
-    bg: 'bg-red-100',
-    icon: 'text-red-800',
-    badge: 'bg-red-500 text-white'
+    bg: 'bg-green-100',
+    icon: 'text-green-800',
+    badge: 'bg-green-500 text-white'
   },
   'ASSURANCES': {
-    bg: 'bg-violet-100',
-    icon: 'text-violet-800',
-    badge: 'bg-violet-500 text-white'
+    bg: 'bg-green-100',
+    icon: 'text-green-800',
+    badge: 'bg-green-500 text-white'
   },
   'default': {
-    bg: 'bg-gray-100',
-    icon: 'text-gray-800',
-    badge: 'bg-gray-500 text-white'
+    bg: 'bg-green-100',
+    icon: 'text-green-800',
+    badge: 'bg-green-500 text-white'
   }
 };
 
@@ -160,7 +161,7 @@ export default async function AdressesUtilesPage({ params: { lang } = { lang: 'f
 
     return (
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-        {/* Hero Section */}
+        {/* Hero Section - CHARTE GRAPHIQUE VERT/ROUGE */}
         <div className="bg-white border-b border-gray-200 shadow-sm">
           <div className="container mx-auto px-4 py-12">
             <div className="max-w-4xl mx-auto text-center">
@@ -182,7 +183,7 @@ export default async function AdressesUtilesPage({ params: { lang } = { lang: 'f
           </div>
         </div>
 
-        {/* Grille des catégories */}
+        {/* Grille des catégories - UNIFORMITÉ TOTALE */}
         <div className="container mx-auto px-4 py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredStats.map((category) => {
@@ -200,12 +201,12 @@ export default async function AdressesUtilesPage({ params: { lang } = { lang: 'f
                   
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
-                      {/* Fond de l'icône - style Chambre Agriculture */}
+                      {/* Fond icône - VERT UNIQUE */}
                       <div className={`p-3 rounded-xl ${colors.bg}`}>
                         <IconComponent className={`w-6 h-6 ${colors.icon}`} />
                       </div>
                       
-                      {/* Badge - MÊME famille de couleurs */}
+                      {/* Badge - VERT UNIQUE */}
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${colors.badge}`}>
                         {category.count || 0} {t('entities')}
                       </span>
