@@ -10,7 +10,6 @@ import {
   Globe2,
   Shield,
   Ship,
-  Factory,
   MapPin
 } from 'lucide-react';
 
@@ -29,7 +28,7 @@ const translations = {
   }
 };
 
-// Mapping des catégories vers les icônes (toutes de la même famille)
+// Mapping des catégories vers les icônes
 const categoryIcons = {
   'BANQUES': Banknote,
   'CHAMBRES D\'AGRICULTURE': Landmark,
@@ -45,20 +44,80 @@ const categoryIcons = {
   'default': Building2
 };
 
-// Couleurs par catégorie (charte graphique - fonds colorés)
+// Couleurs par catégorie (pour l'icône ET le badge)
 const categoryColors = {
-  'BANQUES': 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  'CHAMBRES D\'AGRICULTURE': 'bg-green-100 text-green-800 border-green-200',
-  'CHAMBRES D\'ARTISANAT': 'bg-amber-100 text-amber-800 border-amber-200',
-  'CHAMBRES DE COMMERCE ET D\'INDUSTRIE': 'bg-blue-100 text-blue-800 border-blue-200',
-  'CHAMBRES DE LA PÊCHE': 'bg-cyan-100 text-cyan-800 border-cyan-200',
-  'DIRECTIONS DE COMMERCE': 'bg-purple-100 text-purple-800 border-purple-200',
-  'ENTREPRISES PORTUAIRES': 'bg-sky-100 text-sky-800 border-sky-200',
-  'ORGANISMES OFFICIELS': 'bg-indigo-100 text-indigo-800 border-indigo-200',
-  'AMBASSADES D\'ALGERIE A L\'ETRANGER': 'bg-red-100 text-red-800 border-red-200',
-  'AMBASSADES EN ALGERIE': 'bg-red-100 text-red-800 border-red-200',
-  'ASSURANCES': 'bg-violet-100 text-violet-800 border-violet-200',
-  'default': 'bg-gray-100 text-gray-800 border-gray-200'
+  'BANQUES': {
+    bg: 'bg-emerald-100',
+    text: 'text-emerald-800',
+    border: 'border-emerald-200',
+    badge: 'bg-emerald-500 text-white'
+  },
+  'CHAMBRES D\'AGRICULTURE': {
+    bg: 'bg-green-100',
+    text: 'text-green-800',
+    border: 'border-green-200',
+    badge: 'bg-green-500 text-white'
+  },
+  'CHAMBRES D\'ARTISANAT': {
+    bg: 'bg-amber-100',
+    text: 'text-amber-800',
+    border: 'border-amber-200',
+    badge: 'bg-amber-500 text-white'
+  },
+  'CHAMBRES DE COMMERCE ET D\'INDUSTRIE': {
+    bg: 'bg-blue-100',
+    text: 'text-blue-800',
+    border: 'border-blue-200',
+    badge: 'bg-blue-500 text-white'
+  },
+  'CHAMBRES DE LA PÊCHE': {
+    bg: 'bg-cyan-100',
+    text: 'text-cyan-800',
+    border: 'border-cyan-200',
+    badge: 'bg-cyan-500 text-white'
+  },
+  'DIRECTIONS DE COMMERCE': {
+    bg: 'bg-purple-100',
+    text: 'text-purple-800',
+    border: 'border-purple-200',
+    badge: 'bg-purple-500 text-white'
+  },
+  'ENTREPRISES PORTUAIRES': {
+    bg: 'bg-sky-100',
+    text: 'text-sky-800',
+    border: 'border-sky-200',
+    badge: 'bg-sky-500 text-white'
+  },
+  'ORGANISMES OFFICIELS': {
+    bg: 'bg-indigo-100',
+    text: 'text-indigo-800',
+    border: 'border-indigo-200',
+    badge: 'bg-indigo-500 text-white'
+  },
+  'AMBASSADES D\'ALGERIE A L\'ETRANGER': {
+    bg: 'bg-red-100',
+    text: 'text-red-800',
+    border: 'border-red-200',
+    badge: 'bg-red-500 text-white'
+  },
+  'AMBASSADES EN ALGERIE': {
+    bg: 'bg-red-100',
+    text: 'text-red-800',
+    border: 'border-red-200',
+    badge: 'bg-red-500 text-white'
+  },
+  'ASSURANCES': {
+    bg: 'bg-violet-100',
+    text: 'text-violet-800',
+    border: 'border-violet-200',
+    badge: 'bg-violet-500 text-white'
+  },
+  'default': {
+    bg: 'bg-gray-100',
+    text: 'text-gray-800',
+    border: 'border-gray-200',
+    badge: 'bg-gray-500 text-white'
+  }
 };
 
 export default async function AdressesUtilesPage({ params: { lang } = { lang: 'fr' } }) {
@@ -113,7 +172,7 @@ export default async function AdressesUtilesPage({ params: { lang } = { lang: 'f
 
     return (
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-        {/* Hero Section - CHARTE GRAPHIQUE */}
+        {/* Hero Section */}
         <div className="bg-white border-b border-gray-200 shadow-sm">
           <div className="container mx-auto px-4 py-12">
             <div className="max-w-4xl mx-auto text-center">
@@ -135,12 +194,12 @@ export default async function AdressesUtilesPage({ params: { lang } = { lang: 'f
           </div>
         </div>
 
-        {/* Grille des catégories avec icônes uniformes */}
+        {/* Grille des catégories */}
         <div className="container mx-auto px-4 py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredStats.map((category) => {
               const IconComponent = categoryIcons[category.category] || categoryIcons.default;
-              const colorClass = categoryColors[category.category] || categoryColors.default;
+              const colors = categoryColors[category.category] || categoryColors.default;
               
               return (
                 <Link
@@ -153,11 +212,13 @@ export default async function AdressesUtilesPage({ params: { lang } = { lang: 'f
                   
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
-                      {/* Fond coloré pour l'icône */}
-                      <div className={`p-3 rounded-xl ${colorClass.split(' ')[0]}`}>
-                        <IconComponent className={`w-6 h-6 ${colorClass.split(' ')[1]}`} />
+                      {/* Icône avec fond coloré */}
+                      <div className={`p-3 rounded-xl ${colors.bg}`}>
+                        <IconComponent className={`w-6 h-6 ${colors.text}`} />
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${colorClass}`}>
+                      
+                      {/* Badge avec la MÊME couleur que l'icône */}
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${colors.badge}`}>
                         {category.count || 0} {t('entities')}
                       </span>
                     </div>
