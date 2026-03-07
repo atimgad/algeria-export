@@ -41,6 +41,22 @@ const translations = {
   }
 };
 
+// Catégories à exclure (celles qui vont dans Adresses Utiles)
+const EXCLUDED_CATEGORIES = [
+  'AMBASSADES D\'ALGERIE A L\'ETRANGER',
+  'AMBASSADES EN ALGERIE',
+  'BANQUES',
+  'CHAMBRES D\'AGRICULTURE',
+  'CHAMBRES D\'ARTISANAT',
+  'CHAMBRES DE COMMERCE ET D\'INDUSTRIE',
+  'CHAMBRES DE LA PÊCHE',
+  'DIRECTIONS DE COMMERCE',
+  'ENTREPRISES PORTUAIRES',
+  'ORGANISMES OFFICIELS',
+  'ASSURANCES',
+  'HÔTELS'
+];
+
 // Icônes par catégorie
 const categoryIcons = {
   'AGRICULTURE': Sprout,
@@ -124,7 +140,12 @@ export default async function CategoriesPage({ params: { lang } = { lang: 'fr' }
       );
     }
 
-    const totalEntries = stats.reduce((sum, cat) => sum + (cat.count || 0), 0);
+    // Filtrer pour exclure les adresses utiles
+    const filteredStats = (stats || [])
+      .filter(cat => !EXCLUDED_CATEGORIES.includes(cat.category))
+      .sort((a, b) => (b.count || 0) - (a.count || 0));
+
+    const totalEntries = filteredStats.reduce((sum, cat) => sum + (cat.count || 0), 0);
 
     return (
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
@@ -153,7 +174,7 @@ export default async function CategoriesPage({ params: { lang } = { lang: 'fr' }
         {/* Grille des catégories */}
         <div className="container mx-auto px-4 py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {stats.map((category) => {
+            {filteredStats.map((category) => {
               const IconComponent = categoryIcons[category.category] || categoryIcons.default;
               
               return (
@@ -172,7 +193,7 @@ export default async function CategoriesPage({ params: { lang } = { lang: 'fr' }
                         <IconComponent className={`w-6 h-6 ${categoryStyle.iconColor}`} />
                       </div>
                       
-                      {/* Badge VERT FONCÉ (bg-green-500) comme demandé */}
+                      {/* Badge VERT FONCÉ (bg-green-500) */}
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${categoryStyle.badgeBg} ${categoryStyle.badgeText}`}>
                         {category.count || 0} {t('entities')}
                       </span>
@@ -186,7 +207,7 @@ export default async function CategoriesPage({ params: { lang } = { lang: 'fr' }
                       <div 
                         className="bg-gradient-to-r from-green-500 to-red-500 h-2 rounded-full transition-all duration-500"
                         style={{ 
-                          width: `${Math.min(100, ((category.count || 0) / Math.max(...stats.map(c => c.count))) * 100)}%` 
+                          width: `${Math.min(100, ((category.count || 0) / Math.max(...filteredStats.map(c => c.count))) * 100)}%` 
                         }}
                       ></div>
                     </div>
