@@ -38,7 +38,7 @@ export default async function CategoryExportersPage({
     );
   }
 
-  // Récupération sécurisée du paramètre category
+  // Récupération du paramètre category depuis l'URL
   let category = '';
   if (params && params.category) {
     category = decodeURIComponent(params.category);
@@ -53,8 +53,8 @@ export default async function CategoryExportersPage({
     .select('*', { count: 'exact' })
     .eq('entity_type', 'company');
 
-  // Ajout du filtre par catégorie si elle existe
-  if (category) {
+  // Filtrage par catégorie (si elle est définie et valide)
+  if (category && category !== 'Toutes les catégories') {
     query = query.eq('category', category);
   }
 
@@ -122,10 +122,10 @@ export default async function CategoryExportersPage({
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              {category || 'Toutes les catégories'}
+              {category}
             </h1>
             <p className="text-xl text-green-100">
-              {count || 0} entreprises référencées
+              {count || 0} entreprises référencées dans cette catégorie
             </p>
           </div>
         </div>
