@@ -38,7 +38,7 @@ export default async function ExportersPage({ searchParams }: { searchParams: { 
   let query = supabase
     .from('official_directory')
     .select('*')
-    .not('category', 'in', `(${excludedCategories.map(c => `'${c}'`).join(',')})`);
+    .not('category', 'in', `(${excludedCategories.map(c => `'${c.replace(/'/g, "''")}'`).join(',')})`);
   
   if (searchParams.category) {
     query = query.eq('category', searchParams.category);
