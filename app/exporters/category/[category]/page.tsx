@@ -3,19 +3,24 @@ import Link from 'next/link';
 
 export default async function CategoryPage({ params }: { params: { category: string } }) {
   const supabase = await createServerSupabaseClient();
-  const categoryName = params.category;
-
+  
   if (!supabase) {
-    return <div className="p-8">Erreur de connexion</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white p-8">
+        <Link href="/categories" className="text-green-600">← Retour</Link>
+        <h1 className="text-3xl font-bold mt-4 text-red-600">Erreur de connexion</h1>
+      </div>
+    );
   }
 
-  // Compter directement dans official_directory
+  const categoryName = params.category;
+
+  // MÊME REQUÊTE QUE LA PAGE TEST
   const { count } = await supabase
     .from('official_directory')
     .select('*', { count: 'exact', head: true })
     .eq('category', categoryName);
 
-  // Récupérer les entreprises
   const { data: companies } = await supabase
     .from('official_directory')
     .select('*')
