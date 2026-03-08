@@ -38,25 +38,34 @@ export default async function CategoryExportersPage({
     );
   }
 
-  // Récupération du paramètre category depuis l'URL
-  let category = '';
+  // Décodage du nom de catégorie depuis l'URL
+  let categoryName = '';
   if (params && params.category) {
-    category = decodeURIComponent(params.category);
+    categoryName = decodeURIComponent(params.category);
   }
 
   const currentPage = parseInt(searchParams.page || '1');
   const itemsPerPage = 20;
 
-  // Construction de la requête de base
+  // 1. D'abord, compter le nombre total d'entreprises DANS CETTE CATÉGORIE
+  const countQuery = supabase
+    .from('official_directory')
+    .select('*', { count: 'exact', head: true })
+    .eq('entity_type', 'company')
+    .eq('category', categoryName);
+
+  const { count: totalInCategory, error: countError } = await countQuery;
+
+  if (countError) {
+    console.error('Erreur comptage:', countError);
+  }
+
+  // 2. Ensuite, récupérer les entreprises avec pagination et filtres
   let query = supabase
     .from('official_directory')
-    .select('*', { count: 'exact' })
-    .eq('entity_type', 'company');
-
-  // Filtrage par catégorie (si elle est définie et valide)
-  if (category && category !== 'Toutes les catégories') {
-    query = query.eq('category', category);
-  }
+    .select('*')
+    .eq('entity_type', 'company')
+    .eq('category', categoryName); // ← FILTRE CRITIQUE
 
   // Filtres optionnels
   if (searchParams.nom) {
@@ -79,7 +88,7 @@ export default async function CategoryExportersPage({
   const from = (currentPage - 1) * itemsPerPage;
   const to = from + itemsPerPage - 1;
 
-  const { data: exporters, count, error } = await query
+  const { data: exporters, error } = await query
     .range(from, to);
 
   if (error) {
@@ -87,7 +96,7 @@ export default async function CategoryExportersPage({
     notFound();
   }
 
-  const totalPages = Math.ceil((count || 0) / itemsPerPage);
+  const totalPages = Math.ceil((totalInCategory || 0) / itemsPerPage);
 
   // Fonction pour construire l'URL avec les filtres
   const buildUrl = (params: Record<string, string>) => {
@@ -99,7 +108,7 @@ export default async function CategoryExportersPage({
         url.delete(key);
       }
     });
-    return `/exporters/category/${encodeURIComponent(category)}?${url.toString()}`;
+    return `/exporters/category/${encodeURIComponent(categoryName)}?${url.toString()}`;
   };
 
   return (
@@ -122,10 +131,10 @@ export default async function CategoryExportersPage({
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              {category}
+              {categoryName}
             </h1>
             <p className="text-xl text-green-100">
-              {count || 0} entreprises référencées dans cette catégorie
+              {totalInCategory || 0} entreprises référencées dans cette catégorie
             </p>
           </div>
         </div>
@@ -204,9 +213,9 @@ export default async function CategoryExportersPage({
                 Rechercher
               </button>
               
-              {category && (
+              {categoryName && (
                 <Link
-                  href={`/exporters/category/${encodeURIComponent(category)}`}
+                  href={`/exporters/category/${encodeURIComponent(categoryName)}`}
                   className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
                 >
                   Réinitialiser
