@@ -13,17 +13,19 @@ export default async function CategoryPage({ params }: { params: { category: str
     );
   }
 
-  const categoryName = params.category;
-
-  // ===== LOGS DE DEBUG ULTIME =====
-  console.log('\n=== 🚀 DEBUG CATEGORY PAGE ===');
-  console.log('1. params reçus:', JSON.stringify(params));
-  console.log('2. categoryName:', categoryName);
-  console.log('3. type:', typeof categoryName);
-  console.log('4. length:', categoryName?.length);
-  console.log('5. caractères (codes):', categoryName?.split('').map(c => c.charCodeAt(0)));
-  console.log('6. caractères (visibles):', categoryName?.split('').map(c => `'${c}'`).join(' '));
-  // =================================
+  // Récupération sécurisée du paramètre
+  const categoryName = params?.category || '';
+  
+  // Vérification que la catégorie est présente
+  if (!categoryName) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white p-8">
+        <Link href="/categories" className="text-green-600">← Retour</Link>
+        <h1 className="text-3xl font-bold mt-4 text-red-600">Erreur: Catégorie non spécifiée</h1>
+        <p className="text-gray-600 mt-2">Le paramètre category est manquant dans l'URL</p>
+      </div>
+    );
+  }
 
   // MÊME REQUÊTE QUE LA PAGE TEST
   const { count } = await supabase
@@ -54,7 +56,6 @@ export default async function CategoryPage({ params }: { params: { category: str
           <p><strong>🔍 Diagnostic:</strong></p>
           <p>Catégorie reçue: "{categoryName}"</p>
           <p>Longueur: {categoryName?.length} caractères</p>
-          <p>Codes: {categoryName?.split('').map(c => c.charCodeAt(0)).join(', ')}</p>
           <p>Résultat COUNT: {count}</p>
           <p>Entreprises trouvées: {companies?.length || 0}</p>
         </div>
