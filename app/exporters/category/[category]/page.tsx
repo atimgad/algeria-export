@@ -2,14 +2,26 @@ import { createServerSupabaseClient } from '@/utils/supabase/server';
 import Link from 'next/link';
 
 export default async function CategoryPage({ params }: { params: { category: string } }) {
+  // ===== LOGS DE DEBUG =====
+  console.log('=== DEBUG CATEGORY PAGE ===');
+  console.log('1. params reçus:', params);
+  
+  const categoryName = params.category;
+  console.log('2. categoryName:', categoryName);
+  console.log('3. type:', typeof categoryName);
+  console.log('4. length:', categoryName?.length);
+  console.log('5. caractères:', categoryName?.split('').map(c => c.charCodeAt(0)));
+  // =========================
+
   try {
     const supabase = await createServerSupabaseClient();
     
     if (!supabase) {
+      console.error('❌ Supabase non initialisé');
       return <div style={{padding: '2rem'}}>❌ Supabase non initialisé</div>;
     }
 
-    const categoryName = params.category;
+    console.log('6. Supabase OK, exécution requête COUNT avec:', categoryName);
 
     const { count, error: countError } = await supabase
       .from('official_directory')
@@ -17,8 +29,11 @@ export default async function CategoryPage({ params }: { params: { category: str
       .eq('category', categoryName);
 
     if (countError) {
+      console.error('❌ Erreur COUNT:', countError);
       return <div style={{padding: '2rem'}}>❌ Erreur comptage: {countError.message}</div>;
     }
+
+    console.log('7. COUNT résultat:', count);
 
     const { data: companies, error: dataError } = await supabase
       .from('official_directory')
@@ -27,8 +42,11 @@ export default async function CategoryPage({ params }: { params: { category: str
       .limit(10);
 
     if (dataError) {
+      console.error('❌ Erreur DATA:', dataError);
       return <div style={{padding: '2rem'}}>❌ Erreur données: {dataError.message}</div>;
     }
+
+    console.log('8. DATA résultat:', companies?.length || 0, 'entreprises');
 
     return (
       <div style={{ padding: '2rem' }}>
@@ -42,6 +60,7 @@ export default async function CategoryPage({ params }: { params: { category: str
     );
 
   } catch (err) {
+    console.error('❌ Exception:', err);
     return (
       <div style={{ padding: '2rem' }}>
         <h1 style={{ color: 'red' }}>❌ ERREUR</h1>
