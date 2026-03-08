@@ -30,7 +30,7 @@ export default async function CategoryExportersPage({
   console.log('=== DEBUG CATEGORY PAGE ===');
   console.log('1. Params reçus:', params);
   
-  const headersList = headers();
+  const headersList = await headers();
   const fullUrl = headersList.get('x-url') || headersList.get('referer') || 'URL non disponible';
   console.log('2. URL complète:', fullUrl);
   
