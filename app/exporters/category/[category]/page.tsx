@@ -11,6 +11,7 @@ import {
   Package,
   User
 } from 'lucide-react';
+import { headers } from 'next/headers';
 
 export default async function CategoryExportersPage({ 
   params,
@@ -25,9 +26,18 @@ export default async function CategoryExportersPage({
     produit?: string
   }
 }) {
+  // ========== LOGS DE DEBUG ==========
+  console.log('=== DEBUG CATEGORY PAGE ===');
+  console.log('1. Params reçus:', params);
+  
+  const headersList = headers();
+  const fullUrl = headersList.get('x-url') || headersList.get('referer') || 'URL non disponible';
+  console.log('2. URL complète:', fullUrl);
+  
   const supabase = await createServerSupabaseClient();
   
   if (!supabase) {
+    console.error('❌ Supabase non initialisé');
     return (
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-white p-8">
         <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-6 max-w-3xl mx-auto">
@@ -42,12 +52,17 @@ export default async function CategoryExportersPage({
   let categoryName = '';
   if (params && params.category) {
     categoryName = decodeURIComponent(params.category);
+    console.log('3. CategoryName après décodage:', categoryName);
+  } else {
+    console.log('3. params.category est undefined ou null');
   }
 
   const currentPage = parseInt(searchParams.page || '1');
   const itemsPerPage = 20;
 
   // 1. D'abord, compter le nombre total d'entreprises DANS CETTE CATÉGORIE
+  console.log('4. Exécution requête COUNT avec catégorie:', categoryName);
+  
   const countQuery = supabase
     .from('official_directory')
     .select('*', { count: 'exact', head: true })
@@ -57,44 +72,56 @@ export default async function CategoryExportersPage({
   const { count: totalInCategory, error: countError } = await countQuery;
 
   if (countError) {
-    console.error('Erreur comptage:', countError);
+    console.error('❌ Erreur comptage:', countError);
+  } else {
+    console.log('5. Total trouvé dans catégorie:', totalInCategory);
   }
 
   // 2. Ensuite, récupérer les entreprises avec pagination et filtres
+  console.log('6. Construction requête SELECT avec catégorie:', categoryName);
+  
   let query = supabase
     .from('official_directory')
     .select('*')
     .eq('entity_type', 'company')
-    .eq('category', categoryName); // ← FILTRE CRITIQUE
+    .eq('category', categoryName);
 
   // Filtres optionnels
   if (searchParams.nom) {
+    console.log('   - Filtre nom:', searchParams.nom);
     query = query.ilike('name', `%${searchParams.nom}%`);
   }
 
   if (searchParams.ville) {
+    console.log('   - Filtre ville:', searchParams.ville);
     query = query.ilike('address', `%${searchParams.ville}%`);
   }
 
   if (searchParams.wilaya) {
+    console.log('   - Filtre wilaya:', searchParams.wilaya);
     query = query.ilike('address', `%${searchParams.wilaya}%`);
   }
 
   if (searchParams.produit) {
+    console.log('   - Filtre produit:', searchParams.produit);
     query = query.contains('products', [searchParams.produit]);
   }
 
   // Pagination
   const from = (currentPage - 1) * itemsPerPage;
   const to = from + itemsPerPage - 1;
+  console.log(`7. Pagination: from=${from}, to=${to}`);
 
   const { data: exporters, error } = await query
     .range(from, to);
 
   if (error) {
-    console.error('Erreur:', error);
+    console.error('❌ Erreur requête:', error);
     notFound();
   }
+
+  console.log('8. Nombre d\'entreprises retournées:', exporters?.length);
+  console.log('=== FIN DEBUG ===');
 
   const totalPages = Math.ceil((totalInCategory || 0) / itemsPerPage);
 
