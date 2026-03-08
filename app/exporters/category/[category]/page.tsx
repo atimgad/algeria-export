@@ -1,7 +1,7 @@
 import { createServerSupabaseClient } from '@/utils/supabase/server';
 import Link from 'next/link';
 
-export default async function CategoryPage({ params }) {
+export default async function CategoryPage({ params }: { params: { category: string } }) {
   const supabase = await createServerSupabaseClient();
   const categoryName = params.category;
 
@@ -17,7 +17,8 @@ export default async function CategoryPage({ params }) {
     .limit(10);
 
   return (
-    <div>
+    <div style={{ padding: '2rem' }}>
+      <Link href="/categories">← Retour aux catégories</Link>
       <h1>{categoryName}</h1>
       <p>Total: {count} entreprises</p>
       <pre>{JSON.stringify(companies, null, 2)}</pre>
