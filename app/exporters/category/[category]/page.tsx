@@ -5,23 +5,15 @@ export default async function CategoryPage({ params }: { params: { category: str
   const supabase = await createServerSupabaseClient();
   const categoryName = params.category;
 
-  // Vérification que Supabase est initialisé
   if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white p-8">
-        <Link href="/categories" className="text-green-600">← Retour</Link>
-        <h1 className="text-3xl font-bold mt-4 text-red-600">Erreur de connexion</h1>
-        <p className="text-gray-600 mt-2">Impossible de se connecter à la base de données</p>
-      </div>
-    );
+    return <div className="p-8">Erreur de connexion</div>;
   }
 
-  // Utiliser category_stats
-  const { data: stats } = await supabase
-    .from('category_stats')
-    .select('*')
-    .eq('category', categoryName)
-    .single();
+  // Compter directement dans official_directory
+  const { count } = await supabase
+    .from('official_directory')
+    .select('*', { count: 'exact', head: true })
+    .eq('category', categoryName);
 
   // Récupérer les entreprises
   const { data: companies } = await supabase
@@ -29,16 +21,6 @@ export default async function CategoryPage({ params }: { params: { category: str
     .select('*')
     .eq('category', categoryName)
     .limit(10);
-
-  if (!stats) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white p-8">
-        <Link href="/categories" className="text-green-600">← Retour</Link>
-        <h1 className="text-3xl font-bold mt-4">{categoryName}</h1>
-        <p className="text-gray-600 mt-2">Aucune entreprise trouvée dans cette catégorie</p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
@@ -48,7 +30,7 @@ export default async function CategoryPage({ params }: { params: { category: str
 
       <div className="bg-gradient-to-r from-green-900 to-red-900 text-white p-12">
         <h1 className="text-5xl font-bold">{categoryName}</h1>
-        <p className="text-xl mt-2">{stats.count} entreprises</p>
+        <p className="text-xl mt-2">{count || 0} entreprises</p>
       </div>
 
       <div className="container mx-auto p-8">
