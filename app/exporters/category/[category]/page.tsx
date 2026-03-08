@@ -15,6 +15,16 @@ export default async function CategoryPage({ params }: { params: { category: str
 
   const categoryName = params.category;
 
+  // ===== LOGS DE DEBUG ULTIME =====
+  console.log('\n=== 🚀 DEBUG CATEGORY PAGE ===');
+  console.log('1. params reçus:', JSON.stringify(params));
+  console.log('2. categoryName:', categoryName);
+  console.log('3. type:', typeof categoryName);
+  console.log('4. length:', categoryName?.length);
+  console.log('5. caractères (codes):', categoryName?.split('').map(c => c.charCodeAt(0)));
+  console.log('6. caractères (visibles):', categoryName?.split('').map(c => `'${c}'`).join(' '));
+  // =================================
+
   // MÊME REQUÊTE QUE LA PAGE TEST
   const { count } = await supabase
     .from('official_directory')
@@ -36,6 +46,18 @@ export default async function CategoryPage({ params }: { params: { category: str
       <div className="bg-gradient-to-r from-green-900 to-red-900 text-white p-12">
         <h1 className="text-5xl font-bold">{categoryName}</h1>
         <p className="text-xl mt-2">{count || 0} entreprises</p>
+      </div>
+
+      {/* Diagnostic visible */}
+      <div className="container mx-auto px-4 py-4">
+        <div className="bg-gray-100 p-4 rounded-lg text-sm font-mono">
+          <p><strong>🔍 Diagnostic:</strong></p>
+          <p>Catégorie reçue: "{categoryName}"</p>
+          <p>Longueur: {categoryName?.length} caractères</p>
+          <p>Codes: {categoryName?.split('').map(c => c.charCodeAt(0)).join(', ')}</p>
+          <p>Résultat COUNT: {count}</p>
+          <p>Entreprises trouvées: {companies?.length || 0}</p>
+        </div>
       </div>
 
       <div className="container mx-auto p-8">
