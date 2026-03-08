@@ -11,16 +11,24 @@ export default async function CategoryPage({ params }: { params: { category: str
 
     const categoryName = params.category;
 
-    const { count } = await supabase
+    const { count, error: countError } = await supabase
       .from('official_directory')
       .select('*', { count: 'exact', head: true })
       .eq('category', categoryName);
 
-    const { data: companies } = await supabase
+    if (countError) {
+      return <div style={{padding: '2rem'}}>❌ Erreur comptage: {countError.message}</div>;
+    }
+
+    const { data: companies, error: dataError } = await supabase
       .from('official_directory')
       .select('*')
       .eq('category', categoryName)
       .limit(10);
+
+    if (dataError) {
+      return <div style={{padding: '2rem'}}>❌ Erreur données: {dataError.message}</div>;
+    }
 
     return (
       <div style={{ padding: '2rem' }}>
