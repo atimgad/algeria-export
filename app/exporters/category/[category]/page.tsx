@@ -6,6 +6,18 @@ import { ChevronLeft } from 'lucide-react';
 export default async function CategoryPage({ params }: { params: { category: string } }) {
   const supabase = await createServerSupabaseClient();
   
+  // Vérification que supabase est initialisé
+  if (!supabase) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white p-8">
+        <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-6 max-w-3xl mx-auto">
+          <h2 className="text-red-800 font-semibold text-xl mb-2">Erreur de connexion</h2>
+          <p className="text-red-600">Impossible de se connecter à la base de données</p>
+        </div>
+      </div>
+    );
+  }
+
   // Récupération directe de la catégorie depuis l'URL
   const categoryName = params.category;
   
