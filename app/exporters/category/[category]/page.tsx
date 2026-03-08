@@ -5,7 +5,18 @@ export default async function CategoryPage({ params }: { params: { category: str
   const supabase = await createServerSupabaseClient();
   const categoryName = params.category;
 
-  // Utiliser category_stats (qui fonctionne déjà)
+  // Vérification que Supabase est initialisé
+  if (!supabase) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white p-8">
+        <Link href="/categories" className="text-green-600">← Retour</Link>
+        <h1 className="text-3xl font-bold mt-4 text-red-600">Erreur de connexion</h1>
+        <p className="text-gray-600 mt-2">Impossible de se connecter à la base de données</p>
+      </div>
+    );
+  }
+
+  // Utiliser category_stats
   const { data: stats } = await supabase
     .from('category_stats')
     .select('*')
